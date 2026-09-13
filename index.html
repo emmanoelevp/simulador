@@ -207,6 +207,38 @@
 
   /* ---------- Results ---------- */
   #results{ display:none; }
+
+  .tabs{
+    display:flex;
+    gap: 4px;
+    margin-bottom: -1px;
+  }
+  .tab-btn{
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 14px;
+    background: var(--paper);
+    color: var(--ink-soft);
+    border: 1px solid var(--rule-strong);
+    border-bottom: none;
+    padding: 10px 18px 12px;
+    cursor: pointer;
+    position: relative;
+    top: 1px;
+  }
+  .tab-btn.active{
+    background: var(--paper-raised);
+    color: var(--ink);
+    font-weight: 600;
+    border-color: var(--ink);
+  }
+  .tab-btn:not(.active):hover{ color: var(--ink); }
+  .tab-panel{
+    border: 1px solid var(--ink);
+    border-top-color: var(--ink);
+    padding: 26px 24px 6px;
+    background: var(--paper-raised);
+  }
   .verdict{
     border: 2px solid var(--ink);
     padding: 26px 26px 24px;
@@ -446,6 +478,26 @@
           <output id="ivaRateOut">26,5%</output>
         </div>
       </div>
+
+      <div class="field span2">
+        <label for="pctB2B">Parcela das suas vendas ou prestações para clientes PJ do regime normal (%)
+          <span class="hint">Esses clientes conseguem aproveitar crédito sobre o que você vende a eles</span>
+        </label>
+        <div class="range-row">
+          <input type="range" id="pctB2B" min="0" max="100" value="40">
+          <output id="pctB2BOut">40%</output>
+        </div>
+      </div>
+
+      <div class="field span2">
+        <label for="repasseSimples">Hoje, quanto do seu imposto o cliente PJ consegue aproveitar como crédito (%)
+          <span class="hint">No Simples isso costuma ser baixo ou zero, pois o DAS não destaca ICMS/PIS/COFINS separadamente</span>
+        </label>
+        <div class="range-row">
+          <input type="range" id="repasseSimples" min="0" max="100" value="15">
+          <output id="repasseSimplesOut">15%</output>
+        </div>
+      </div>
     </div>
 
     <div class="btn-row">
@@ -460,36 +512,66 @@
       <h2>Resultado da simulação</h2>
     </div>
 
-    <div class="verdict" id="verdict"></div>
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" id="tabBtnCarga" role="tab" aria-selected="true">Carga tributária</button>
+      <button class="tab-btn" id="tabBtnCredito" role="tab" aria-selected="false">Créditos tomados e repassados</button>
+    </div>
 
-    <table class="compare" id="compareTable">
-      <caption>Carga tributária mensal estimada, por regime</caption>
-      <thead>
-        <tr>
-          <th>Regime</th>
-          <th class="num">Carga mensal</th>
-          <th class="num">Alíquota efetiva</th>
-        </tr>
-      </thead>
-      <tbody id="compareBody"></tbody>
-    </table>
+    <div class="tab-panel" id="panelCarga">
+      <div class="verdict" id="verdict"></div>
 
-    <details class="breakdown" id="bkSimples">
-      <summary>Ver como o Simples Nacional foi calculado</summary>
-      <div id="bkSimplesBody"></div>
-    </details>
+      <table class="compare" id="compareTable">
+        <caption>Carga tributária mensal estimada, por regime</caption>
+        <thead>
+          <tr>
+            <th>Regime</th>
+            <th class="num">Carga mensal</th>
+            <th class="num">Alíquota efetiva</th>
+          </tr>
+        </thead>
+        <tbody id="compareBody"></tbody>
+      </table>
 
-    <details class="breakdown" id="bkPresumido">
-      <summary>Ver como o Lucro Presumido foi calculado</summary>
-      <div id="bkPresumidoBody"></div>
-    </details>
+      <details class="breakdown" id="bkSimples">
+        <summary>Ver como o Simples Nacional foi calculado</summary>
+        <div id="bkSimplesBody"></div>
+      </details>
 
-    <details class="breakdown" id="bkReforma">
-      <summary>Ver como a projeção com IVA pleno foi calculada</summary>
-      <div id="bkReformaBody"></div>
-    </details>
+      <details class="breakdown" id="bkPresumido">
+        <summary>Ver como o Lucro Presumido foi calculado</summary>
+        <div id="bkPresumidoBody"></div>
+      </details>
 
-    <p class="reform-note">A transição vale para todos até 2033. Empresas do Simples decidem em setembro/2026 se querem migrar para 2027, e — a partir de 2027 — podem apurar o IBS/CBS "por fora" do DAS se isso gerar mais crédito para seus clientes. Essa decisão depende de quem são seus clientes (pessoa física ou jurídica) e não está totalmente capturada nesta simulação.</p>
+      <details class="breakdown" id="bkReforma">
+        <summary>Ver como a projeção com IVA pleno foi calculada</summary>
+        <div id="bkReformaBody"></div>
+      </details>
+
+      <p class="reform-note">A transição vale para todos até 2033. Empresas do Simples decidem em setembro/2026 se querem migrar para 2027, e — a partir de 2027 — podem apurar o IBS/CBS "por fora" do DAS se isso gerar mais crédito para seus clientes. Essa decisão depende de quem são seus clientes (pessoa física ou jurídica) e é justamente o que a aba de créditos ao lado tenta medir.</p>
+    </div>
+
+    <div class="tab-panel" id="panelCredito" hidden>
+      <div class="verdict" id="verdictCredito"></div>
+
+      <table class="compare" id="creditTable">
+        <caption>Crédito tributário mensal, por regime</caption>
+        <thead>
+          <tr>
+            <th>Regime</th>
+            <th class="num">Crédito tomado nas compras</th>
+            <th class="num">Crédito repassado ao cliente PJ</th>
+          </tr>
+        </thead>
+        <tbody id="creditBody"></tbody>
+      </table>
+
+      <details class="breakdown" id="bkCredito" open>
+        <summary>Como esses números foram calculados</summary>
+        <div id="bkCreditoBody"></div>
+      </details>
+
+      <p class="reform-note">"Crédito tomado" é o quanto sua empresa consegue abater de imposto ao comprar insumos ou mercadorias. "Crédito repassado" é o quanto do imposto embutido na sua nota o seu cliente PJ do regime normal consegue usar para abater o imposto dele — quanto maior esse número, mais competitiva fica sua nota fiscal para quem compra de você.</p>
+    </div>
   </section>
 
   <footer>
@@ -584,6 +666,29 @@
     return { debito, credito, ivaLiquido, cpp, irpj: presumido.irpj, adicional: presumido.adicional, csll: presumido.csll, total };
   }
 
+  // ---------- Créditos tomados e repassados ----------
+  function calcCreditos(setor, faturamentoMensal, comprasComCredito, icmsIssPct, simples, presumido, reforma, pctB2BVal, repasseSimplesPct, ivaRateVal){
+    const servico = (setor === 'servicos_geral' || setor === 'servicos_intelectuais');
+    const b2b = pctB2BVal / 100;
+
+    // Crédito tomado nas compras (o que a própria empresa abate)
+    const tomadoSimples = 0; // Simples normalmente não se apropria de créditos de ICMS/PIS/COFINS
+    const tomadoPresumido = servico ? 0 : comprasComCredito * (icmsIssPct / 100); // só ICMS; PIS/COFINS é cumulativo no Presumido
+    const tomadoReforma = reforma.credito; // IBS/CBS não cumulativo pleno
+
+    // Crédito repassado ao cliente PJ do regime normal (pondera pela fatia B2B)
+    const repassadoSimples = simples.total * (repasseSimplesPct / 100) * b2b;
+    const repassadoPresumido = (servico ? 0 : presumido.icmsIss) * b2b; // só ICMS é repassável; PIS/COFINS cumulativo não gera crédito
+    const debitoReforma = faturamentoMensal * (ivaRateVal / 100);
+    const repassadoReforma = debitoReforma * b2b; // IBS/CBS pleno: 100% do destacado é creditável
+
+    return {
+      tomadoSimples, tomadoPresumido, tomadoReforma,
+      repassadoSimples, repassadoPresumido, repassadoReforma,
+      debitoReforma, servico
+    };
+  }
+
   // ---------- UI wiring ----------
   const setorSel = $('setor');
   const anexoSel = $('anexo');
@@ -599,6 +704,25 @@
   creditoPct.addEventListener('input', () => creditoPctOut.textContent = creditoPct.value + '%');
   const ivaRate = $('ivaRate'), ivaRateOut = $('ivaRateOut');
   ivaRate.addEventListener('input', () => ivaRateOut.textContent = parseFloat(ivaRate.value).toLocaleString('pt-BR',{minimumFractionDigits:1}) + '%');
+
+  const pctB2B = $('pctB2B'), pctB2BOut = $('pctB2BOut');
+  pctB2B.addEventListener('input', () => pctB2BOut.textContent = pctB2B.value + '%');
+  const repasseSimples = $('repasseSimples'), repasseSimplesOut = $('repasseSimplesOut');
+  repasseSimples.addEventListener('input', () => repasseSimplesOut.textContent = repasseSimples.value + '%');
+
+  const tabBtnCarga = $('tabBtnCarga'), tabBtnCredito = $('tabBtnCredito');
+  const panelCarga = $('panelCarga'), panelCredito = $('panelCredito');
+  function showTab(which){
+    const isCarga = which === 'carga';
+    panelCarga.hidden = !isCarga;
+    panelCredito.hidden = isCarga;
+    tabBtnCarga.classList.toggle('active', isCarga);
+    tabBtnCredito.classList.toggle('active', !isCarga);
+    tabBtnCarga.setAttribute('aria-selected', isCarga);
+    tabBtnCredito.setAttribute('aria-selected', !isCarga);
+  }
+  tabBtnCarga.addEventListener('click', () => showTab('carga'));
+  tabBtnCredito.addEventListener('click', () => showTab('credito'));
 
   $('calcBtn').addEventListener('click', () => {
     const setor = setorSel.value;
@@ -691,7 +815,45 @@
       <div class="bk-row"><span>Total mensal projetado</span><span>${fmtBRL(reforma.total)}</span></div>
     `;
 
+    // Créditos tomados e repassados
+    const comprasComCredito = faturamentoMensal * (creditoPctVal / 100);
+    const cred = calcCreditos(setor, faturamentoMensal, comprasComCredito, icmsIssPct, simples, presumido, reforma, parseFloat(pctB2B.value), parseFloat(repasseSimples.value), ivaRateVal);
+
+    const creditRows = [
+      { label: `Simples Nacional (Anexo ${simples.anexoUsado})`, tomado: cred.tomadoSimples, repassado: cred.repassadoSimples },
+      { label: 'Lucro Presumido', tomado: cred.tomadoPresumido, repassado: cred.repassadoPresumido },
+      { label: 'Regime pleno — IVA (2033)', tomado: cred.tomadoReforma, repassado: cred.repassadoReforma },
+    ];
+    const creditBody = $('creditBody');
+    creditBody.innerHTML = '';
+    creditRows.forEach(r => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${r.label}</td><td class="num">${fmtBRL(r.tomado)}</td><td class="num">${fmtBRL(r.repassado)}</td>`;
+      creditBody.appendChild(tr);
+    });
+
+    const repassadoHoje = best === 0 ? cred.repassadoSimples : cred.repassadoPresumido;
+    const regimeHojeLabel = best === 0 ? 'Simples Nacional' : 'Lucro Presumido';
+    const ganhoRepasse = cred.repassadoReforma - repassadoHoje;
+    const verdictCredito = $('verdictCredito');
+    verdictCredito.innerHTML = `
+      <h3>${repassadoHoje < cred.repassadoReforma * 0.5 ? 'Sua nota fiscal repassa pouco crédito hoje' : 'Sua nota fiscal já repassa uma parcela razoável de crédito'}</h3>
+      <p>Hoje, no ${regimeHojeLabel} (seu regime mais barato agora), seus clientes PJ do regime normal conseguem aproveitar cerca de <span class="savings">${fmtBRL(repassadoHoje)}</span> por mês em crédito sobre o que compram de você.</p>
+      <p>Em um cenário de IVA pleno, isso subiria para <span class="savings">${fmtBRL(cred.repassadoReforma)}</span> — uma diferença de <span class="savings">${fmtBRL(Math.abs(ganhoRepasse))}</span>, que tende a tornar sua nota mais competitiva para quem compra de você, especialmente se a fatia de clientes PJ crescer.</p>
+      <p>Quanto maior a parcela dos seus insumos com direito a crédito, maior também o abatimento que você mesmo consegue tomar — hoje isso costuma pesar mais no Lucro Presumido (via ICMS) e quase não existe no Simples.</p>
+    `;
+
+    $('bkCreditoBody').innerHTML = `
+      <div class="bk-row"><span>Compras/insumos com direito a crédito (estimado)</span><span>${fmtBRL(comprasComCredito)}</span></div>
+      <div class="bk-row"><span>Simples — crédito tomado nas compras</span><span>${fmtBRL(cred.tomadoSimples)} (regra geral: não se apropria)</span></div>
+      <div class="bk-row"><span>Presumido — crédito tomado (só ${cred.servico ? 'ISS, geralmente não gera crédito' : 'ICMS'})</span><span>${fmtBRL(cred.tomadoPresumido)}</span></div>
+      <div class="bk-row"><span>Regime pleno — crédito tomado (IBS/CBS não cumulativo)</span><span>${fmtBRL(cred.tomadoReforma)}</span></div>
+      <div class="bk-row"><span>Débito de IVA pleno destacado na nota (100% da alíquota)</span><span>${fmtBRL(cred.debitoReforma)}</span></div>
+      <div class="bk-row"><span>Parcela das vendas para clientes PJ do regime normal</span><span>${pctB2B.value}%</span></div>
+    `;
+
     $('results').style.display = 'block';
+    showTab('carga');
     $('results').scrollIntoView({ behavior:'smooth', block:'start' });
   });
 })();
