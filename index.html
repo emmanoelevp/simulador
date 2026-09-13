@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador Tributário EVP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #efeee4;
+    --paper-raised: #f7f6ee;
+    --ink: #1e2a22;
+    --ink-soft: #4b5a4f;
+    --rule: #c9c4b2;
+    --rule-strong: #a9a38c;
+    --brass: #a8792e;
+    --brass-dark: #7e5b1f;
+    --brick: #8b3a3a;
+    --forest: #3c5a41;
+    --serif: 'Source Serif 4', serif;
+    --sans: 'IBM Plex Sans', sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before{
+    content:"";
+    position: fixed;
+    inset:0;
+    pointer-events:none;
+    background-image:
+      linear-gradient(var(--rule) 1px, transparent 1px);
+    background-size: 100% 42px;
+    opacity: .05;
+    z-index: 0;
+  }
+
+  .wrap{
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ---------- Header / document block ---------- */
+  header.doc{
+    border-bottom: 2px solid var(--ink);
+    padding: 40px 0 22px;
+    margin-bottom: 40px;
+  }
+  .doc-top{
+    display:flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+    letter-spacing: .02em;
+    margin-bottom: 22px;
+  }
+  h1.title{
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(34px, 5.5vw, 54px);
+    line-height: 1.05;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+  }
+  h1.title em{
+    font-style: normal;
+    color: var(--brass-dark);
+  }
+  .subtitle{
+    max-width: 60ch;
+    font-size: 16.5px;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+  .doc-meta{
+    margin-top: 24px;
+    display:flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .doc-meta strong{ color: var(--ink); font-weight: 500; }
+
+  /* ---------- Section framing (form as ledger) ---------- */
+  section.sheet{
+    border-top: 1px solid var(--rule-strong);
+    padding-top: 28px;
+    margin-top: 36px;
+  }
+  .sheet-head{
+    display:flex;
+    align-items:baseline;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .sheet-num{
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--brass-dark);
+    border: 1px solid var(--brass-dark);
+    padding: 2px 8px;
+    flex-shrink:0;
+  }
+  .sheet-head h2{
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 24px;
+    margin: 0;
+  }
+  .sheet-note{
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin: -10px 0 22px 46px;
+    max-width: 56ch;
+  }
+
+  /* ---------- Fields ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 28px;
+  }
+  .grid.full{ grid-template-columns: 1fr; }
+  .field{ display:flex; flex-direction:column; gap:6px; }
+  .field.span2{ grid-column: 1 / -1; }
+  label{
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  label .hint{
+    display:block;
+    font-weight: 400;
+    color: var(--ink-soft);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  input[type="text"], input[type="number"], select{
+    font-family: var(--mono);
+    font-size: 15px;
+    padding: 10px 12px;
+    border: 1px solid var(--rule-strong);
+    background: var(--paper-raised);
+    color: var(--ink);
+    border-radius: 0;
+    width: 100%;
+  }
+  select{ font-family: var(--sans); font-size: 14.5px; }
+  input:focus, select:focus{
+    outline: 2px solid var(--brass);
+    outline-offset: 1px;
+    border-color: var(--brass);
+  }
+  input[type="range"]{
+    width: 100%;
+    accent-color: var(--brass-dark);
+  }
+  .range-row{
+    display:flex; align-items:center; gap:14px;
+  }
+  .range-row output{
+    font-family: var(--mono);
+    font-size: 15px;
+    min-width: 58px;
+    text-align:right;
+  }
+
+  .btn-row{
+    margin-top: 34px;
+    display:flex;
+    align-items:center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  button.calc{
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 15px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 14px 26px;
+    cursor: pointer;
+    letter-spacing: .01em;
+  }
+  button.calc:hover{ background: var(--brass-dark); }
+  .btn-caption{ font-size: 13px; color: var(--ink-soft); }
+
+  /* ---------- Results ---------- */
+  #results{ display:none; }
+  .verdict{
+    border: 2px solid var(--ink);
+    padding: 26px 26px 24px;
+    margin-bottom: 32px;
+    position: relative;
+    background: var(--paper-raised);
+  }
+  .verdict::before{
+    content: "PARECER";
+    position:absolute;
+    top:-11px; left: 22px;
+    background: var(--paper-raised);
+    padding: 0 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .08em;
+    color: var(--brass-dark);
+  }
+  .verdict h3{
+    font-family: var(--serif);
+    font-size: 22px;
+    margin: 4px 0 10px;
+  }
+  .verdict p{ margin: 0 0 10px; color: var(--ink-soft); font-size: 14.5px; }
+  .verdict p:last-child{ margin-bottom: 0; }
+  .verdict .savings{
+    font-family: var(--mono);
+    color: var(--forest);
+    font-weight: 600;
+  }
+  .verdict .savings.negative{ color: var(--brick); }
+
+  table.compare{
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 28px;
+    font-size: 14.5px;
+  }
+  table.compare caption{
+    text-align:left;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  table.compare th, table.compare td{
+    border-bottom: 1px solid var(--rule);
+    padding: 10px 8px;
+    text-align: right;
+  }
+  table.compare th:first-child, table.compare td:first-child{
+    text-align:left;
+  }
+  table.compare thead th{
+    font-weight: 600;
+    border-bottom: 2px solid var(--ink);
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    text-transform: none;
+  }
+  table.compare td.num, table.compare th.num{ font-family: var(--mono); }
+  table.compare tr.best td{ font-weight: 600; color: var(--forest); }
+  table.compare tr.best td:first-child::after{
+    content: " ◆ menor carga hoje";
+    font-family: var(--sans);
+    font-weight: 400;
+    font-size: 11.5px;
+    color: var(--forest);
+  }
+
+  details.breakdown{
+    border: 1px solid var(--rule-strong);
+    padding: 14px 18px;
+    margin-bottom: 14px;
+    background: var(--paper-raised);
+  }
+  details.breakdown summary{
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    list-style: none;
+  }
+  details.breakdown summary::-webkit-details-marker{ display:none; }
+  details.breakdown summary::before{
+    content: "+ ";
+    font-family: var(--mono);
+    color: var(--brass-dark);
+  }
+  details.breakdown[open] summary::before{ content: "– "; }
+  .bk-row{
+    display:flex; justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .bk-row:last-child{ border-bottom:none; font-weight:600; padding-top:10px; }
+  .bk-row span:first-child{ font-family: var(--sans); color: var(--ink-soft); }
+
+  .reform-note{
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    border-left: 3px solid var(--brass);
+    padding: 4px 0 4px 16px;
+    margin: 18px 0 0;
+  }
+
+  footer{
+    margin-top: 60px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule-strong);
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+  footer p{ max-width: 72ch; margin: 0 0 10px; }
+
+  @media (max-width: 640px){
+    .grid{ grid-template-columns: 1fr; }
+    .sheet-note{ margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc">
+    <div class="doc-top">
+      <span>EVP · PLANEJAMENTO TRIBUTÁRIO</span>
+      <span id="today"></span>
+    </div>
+    <h1 class="title">Simulador<br>Tributário <em>EVP</em></h1>
+    <p class="subtitle">Compare, hoje, o quanto sua empresa paga no Simples Nacional e no Lucro Presumido — e o que muda quando a CBS e o IBS entrarem em regime pleno.</p>
+    <div class="doc-meta">
+      <span>Base legal: <strong>EC 132/2023 · LC 214/2025</strong></span>
+      <span>Transição: <strong>2026 – 2033</strong></span>
+      <span>Cálculo: <strong>100% no navegador</strong></span>
+    </div>
+  </header>
+
+  <section class="sheet" id="form-section">
+    <div class="sheet-head">
+      <span class="sheet-num">01</span>
+      <h2>A empresa</h2>
+    </div>
+    <p class="sheet-note">Use números aproximados dos últimos 12 meses — dá para refazer a simulação quantas vezes quiser.</p>
+
+    <div class="grid">
+      <div class="field">
+        <label for="setor">Atividade principal
+          <span class="hint">Define a presunção de lucro e o anexo sugerido</span>
+        </label>
+        <select id="setor">
+          <option value="comercio">Comércio</option>
+          <option value="industria">Indústria</option>
+          <option value="servicos_geral">Serviços em geral</option>
+          <option value="servicos_intelectuais">Serviços intelectuais / regulamentados</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="anexo">Anexo do Simples Nacional
+          <span class="hint">Ajustado automaticamente; você pode corrigir</span>
+        </label>
+        <select id="anexo">
+          <option value="I">Anexo I — Comércio</option>
+          <option value="II">Anexo II — Indústria</option>
+          <option value="III">Anexo III — Serviços</option>
+          <option value="IV">Anexo IV — Serviços (sem CPP na alíquota)</option>
+          <option value="V">Anexo V — Serviços (Fator R &lt; 28%)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="faturamentoMensal">Faturamento bruto mensal médio (R$)</label>
+        <input type="text" inputmode="numeric" id="faturamentoMensal" placeholder="Ex.: 45000" value="45000">
+      </div>
+
+      <div class="field">
+        <label for="rbt12">Receita bruta — últimos 12 meses (R$)
+          <span class="hint">Deixe em branco para usar 12× o valor mensal</span>
+        </label>
+        <input type="text" inputmode="numeric" id="rbt12" placeholder="Ex.: 540000">
+      </div>
+
+      <div class="field">
+        <label for="folhaMensal">Folha de pagamento mensal — salários + encargos do trabalhador (R$)</label>
+        <input type="text" inputmode="numeric" id="folhaMensal" placeholder="Ex.: 8000" value="8000">
+      </div>
+
+      <div class="field">
+        <label for="folha12">Folha de pagamento acumulada — 12 meses (R$)
+          <span class="hint">Usada no Fator R para os Anexos III/V</span>
+        </label>
+        <input type="text" inputmode="numeric" id="folha12" placeholder="Deixe em branco para usar 12× a folha mensal">
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="assumptions-section">
+    <div class="sheet-head">
+      <span class="sheet-num">02</span>
+      <h2>Premissas do Lucro Presumido e da reforma</h2>
+    </div>
+    <p class="sheet-note">Ajuste se souber os números reais da sua empresa; os valores sugeridos são pontos de partida razoáveis.</p>
+
+    <div class="grid">
+      <div class="field">
+        <label for="icmsIss">Alíquota de ICMS ou ISS aplicável (%)
+          <span class="hint">ICMS interno do estado, ou ISS do município</span>
+        </label>
+        <input type="text" inputmode="decimal" id="icmsIss" value="5">
+      </div>
+
+      <div class="field">
+        <label for="encargosFolha">Encargos patronais sobre a folha (%)
+          <span class="hint">INSS patronal + RAT + terceiros, aprox. 28%</span>
+        </label>
+        <input type="text" inputmode="decimal" id="encargosFolha" value="28">
+      </div>
+
+      <div class="field span2">
+        <label for="creditoPct">Parcela da receita com direito a crédito de tributos sobre insumos (%)
+          <span class="hint">Compras de mercadoria, matéria-prima ou serviços tomados de fornecedores do regime normal</span>
+        </label>
+        <div class="range-row">
+          <input type="range" id="creditoPct" min="0" max="80" value="40">
+          <output id="creditoPctOut">40%</output>
+        </div>
+      </div>
+
+      <div class="field span2">
+        <label for="ivaRate">Alíquota de referência do IVA dual (CBS + IBS) em regime pleno (%)
+          <span class="hint">Estimativa de mercado para 2033; ajuste conforme estudos mais recentes</span>
+        </label>
+        <div class="range-row">
+          <input type="range" id="ivaRate" min="20" max="30" step="0.1" value="26.5">
+          <output id="ivaRateOut">26,5%</output>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="calc" id="calcBtn">Calcular simulação</button>
+      <span class="btn-caption">Nada é enviado a servidor algum — o cálculo roda só no seu navegador.</span>
+    </div>
+  </section>
+
+  <section class="sheet" id="results">
+    <div class="sheet-head">
+      <span class="sheet-num">03</span>
+      <h2>Resultado da simulação</h2>
+    </div>
+
+    <div class="verdict" id="verdict"></div>
+
+    <table class="compare" id="compareTable">
+      <caption>Carga tributária mensal estimada, por regime</caption>
+      <thead>
+        <tr>
+          <th>Regime</th>
+          <th class="num">Carga mensal</th>
+          <th class="num">Alíquota efetiva</th>
+        </tr>
+      </thead>
+      <tbody id="compareBody"></tbody>
+    </table>
+
+    <details class="breakdown" id="bkSimples">
+      <summary>Ver como o Simples Nacional foi calculado</summary>
+      <div id="bkSimplesBody"></div>
+    </details>
+
+    <details class="breakdown" id="bkPresumido">
+      <summary>Ver como o Lucro Presumido foi calculado</summary>
+      <div id="bkPresumidoBody"></div>
+    </details>
+
+    <details class="breakdown" id="bkReforma">
+      <summary>Ver como a projeção com IVA pleno foi calculada</summary>
+      <div id="bkReformaBody"></div>
+    </details>
+
+    <p class="reform-note">A transição vale para todos até 2033. Empresas do Simples decidem em setembro/2026 se querem migrar para 2027, e — a partir de 2027 — podem apurar o IBS/CBS "por fora" do DAS se isso gerar mais crédito para seus clientes. Essa decisão depende de quem são seus clientes (pessoa física ou jurídica) e não está totalmente capturada nesta simulação.</p>
+  </section>
+
+  <footer>
+    <p><strong>Isto é uma estimativa educacional, não uma orientação tributária definitiva.</strong> O simulador usa as tabelas vigentes do Simples Nacional e um modelo simplificado do Lucro Presumido; a integração final do IBS/CBS ao Simples Nacional ainda está sendo regulamentada e pode mudar até 2033. Antes de trocar de regime, confirme os números com um contador — a decisão também envolve prazos, obrigações acessórias e o perfil dos seus clientes.</p>
+    <p>Simulador Tributário EVP — ferramenta estática, sem coleta de dados, hospedada no GitHub Pages.</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  const $ = (id) => document.getElementById(id);
+
+  $('today').textContent = new Date().toLocaleDateString('pt-BR', { year:'numeric', month:'long', day:'numeric' });
+
+  const fmtBRL = (v) => v.toLocaleString('pt-BR', { style:'currency', currency:'BRL', maximumFractionDigits:0 });
+  const fmtPct = (v) => v.toLocaleString('pt-BR', { minimumFractionDigits:1, maximumFractionDigits:2 }) + '%';
+  const parseNum = (str) => {
+    if (!str) return 0;
+    const cleaned = String(str).replace(/[^\d.,-]/g,'').replace(/\.(?=\d{3})/g,'').replace(',','.');
+    const n = parseFloat(cleaned);
+    return isNaN(n) ? 0 : n;
+  };
+
+  // ---------- Simples Nacional tables (LC 123/2006, faixas vigentes) ----------
+  const TABLES = {
+    I:   [[180000,0.040,0],[360000,0.073,5940],[720000,0.095,13860],[1800000,0.107,22500],[3600000,0.143,87300],[4800000,0.190,378000]],
+    II:  [[180000,0.045,0],[360000,0.078,5940],[720000,0.100,13860],[1800000,0.112,22500],[3600000,0.147,85500],[4800000,0.300,720000]],
+    III: [[180000,0.060,0],[360000,0.112,9360],[720000,0.135,17640],[1800000,0.160,35640],[3600000,0.210,125640],[4800000,0.330,648000]],
+    IV:  [[180000,0.045,0],[360000,0.090,8100],[720000,0.102,12420],[1800000,0.140,39780],[3600000,0.220,183780],[4800000,0.330,828000]],
+    V:   [[180000,0.155,0],[360000,0.180,4500],[720000,0.195,9900],[1800000,0.205,17100],[3600000,0.230,62100],[4800000,0.305,540000]],
+  };
+
+  function faixaFor(table, rbt12){
+    for (const [limit, aliq, deduz] of table){
+      if (rbt12 <= limit) return { limit, aliq, deduz };
+    }
+    return table[table.length - 1].map ? null : { limit: table[5][0], aliq: table[5][1], deduz: table[5][2] };
+  }
+
+  function calcSimples(anexoInput, setor, rbt12, faturamentoMensal, folha12){
+    let anexoUsado = anexoInput;
+    let fatorR = null;
+    if (anexoInput === 'III' || anexoInput === 'V'){
+      fatorR = rbt12 > 0 ? (folha12 / rbt12) : 0;
+      anexoUsado = fatorR >= 0.28 ? 'III' : 'V';
+    }
+    const table = TABLES[anexoUsado];
+    const f = faixaFor(table, rbt12);
+    const aliqEfetiva = rbt12 > 0 ? ((rbt12 * f.aliq) - f.deduz) / rbt12 : f.aliq;
+    let dasMensal = faturamentoMensal * aliqEfetiva;
+    let cppExtra = 0;
+    if (anexoUsado === 'IV'){
+      cppExtra = 0.20 * (folha12 / 12);
+      dasMensal += cppExtra;
+    }
+    return {
+      anexoUsado, fatorR, aliqNominal: f.aliq, deduz: f.deduz, aliqEfetiva,
+      dasMensal, cppExtra, total: dasMensal
+    };
+  }
+
+  // ---------- Lucro Presumido ----------
+  function calcPresumido(setor, faturamentoMensal, folhaMensal, icmsIssPct, encargosFolhaPct){
+    const servico = (setor === 'servicos_geral' || setor === 'servicos_intelectuais');
+    const presIRPJ = servico ? 0.32 : 0.08;
+    const presCSLL = servico ? 0.32 : 0.12;
+
+    const baseIRPJ = faturamentoMensal * presIRPJ;
+    const baseCSLL = faturamentoMensal * presCSLL;
+
+    const irpj = baseIRPJ * 0.15;
+    const adicional = Math.max(0, baseIRPJ - 20000) * 0.10;
+    const csll = baseCSLL * 0.09;
+    const pis = faturamentoMensal * 0.0065;
+    const cofins = faturamentoMensal * 0.03;
+    const icmsIss = faturamentoMensal * (icmsIssPct / 100);
+    const cpp = folhaMensal * (encargosFolhaPct / 100);
+
+    const total = irpj + adicional + csll + pis + cofins + icmsIss + cpp;
+    return { presIRPJ, presCSLL, irpj, adicional, csll, pis, cofins, icmsIss, cpp, total, servico };
+  }
+
+  // ---------- Projeção — IVA pleno (CBS+IBS, cenário 2033) ----------
+  function calcReforma(faturamentoMensal, folhaMensal, encargosFolhaPct, presumido, creditoPct, ivaRatePct){
+    const ivaRate = ivaRatePct / 100;
+    const debito = faturamentoMensal * ivaRate;
+    const credito = faturamentoMensal * (creditoPct / 100) * ivaRate;
+    const ivaLiquido = Math.max(0, debito - credito);
+    const cpp = folhaMensal * (encargosFolhaPct / 100);
+    const total = presumido.irpj + presumido.adicional + presumido.csll + cpp + ivaLiquido;
+    return { debito, credito, ivaLiquido, cpp, irpj: presumido.irpj, adicional: presumido.adicional, csll: presumido.csll, total };
+  }
+
+  // ---------- UI wiring ----------
+  const setorSel = $('setor');
+  const anexoSel = $('anexo');
+
+  function suggestAnexo(){
+    const map = { comercio:'I', industria:'II', servicos_geral:'III', servicos_intelectuais:'V' };
+    anexoSel.value = map[setorSel.value] || 'III';
+  }
+  setorSel.addEventListener('change', suggestAnexo);
+  suggestAnexo();
+
+  const creditoPct = $('creditoPct'), creditoPctOut = $('creditoPctOut');
+  creditoPct.addEventListener('input', () => creditoPctOut.textContent = creditoPct.value + '%');
+  const ivaRate = $('ivaRate'), ivaRateOut = $('ivaRateOut');
+  ivaRate.addEventListener('input', () => ivaRateOut.textContent = parseFloat(ivaRate.value).toLocaleString('pt-BR',{minimumFractionDigits:1}) + '%');
+
+  $('calcBtn').addEventListener('click', () => {
+    const setor = setorSel.value;
+    const anexo = anexoSel.value;
+    const faturamentoMensal = parseNum($('faturamentoMensal').value) || 0;
+    let rbt12 = parseNum($('rbt12').value);
+    if (!rbt12) rbt12 = faturamentoMensal * 12;
+    const folhaMensal = parseNum($('folhaMensal').value) || 0;
+    let folha12 = parseNum($('folha12').value);
+    if (!folha12) folha12 = folhaMensal * 12;
+    const icmsIssPct = parseNum($('icmsIss').value);
+    const encargosFolhaPct = parseNum($('encargosFolha').value);
+    const creditoPctVal = parseFloat(creditoPct.value);
+    const ivaRateVal = parseFloat(ivaRate.value);
+
+    if (faturamentoMensal <= 0){
+      alert('Informe o faturamento mensal para calcular.');
+      return;
+    }
+
+    const simples = calcSimples(anexo, setor, rbt12, faturamentoMensal, folha12);
+    const presumido = calcPresumido(setor, faturamentoMensal, folhaMensal, icmsIssPct, encargosFolhaPct);
+    const reforma = calcReforma(faturamentoMensal, folhaMensal, encargosFolhaPct, presumido, creditoPctVal, ivaRateVal);
+
+    // Comparison table (Simples vs Presumido hoje; Reforma como projeção à parte)
+    const rows = [
+      { label: `Simples Nacional — hoje (Anexo ${simples.anexoUsado})`, total: simples.total, aliq: simples.aliqEfetiva },
+      { label: 'Lucro Presumido — hoje', total: presumido.total, aliq: presumido.total / faturamentoMensal },
+    ];
+    const best = rows[0].total <= rows[1].total ? 0 : 1;
+
+    const tbody = $('compareBody');
+    tbody.innerHTML = '';
+    rows.forEach((r, i) => {
+      const tr = document.createElement('tr');
+      if (i === best) tr.className = 'best';
+      tr.innerHTML = `<td>${r.label}</td><td class="num">${fmtBRL(r.total)}</td><td class="num">${fmtPct(r.aliq*100)}</td>`;
+      tbody.appendChild(tr);
+    });
+    const trReforma = document.createElement('tr');
+    trReforma.innerHTML = `<td>Regime normal com IVA pleno — projeção 2033</td><td class="num">${fmtBRL(reforma.total)}</td><td class="num">${fmtPct(reforma.total/faturamentoMensal*100)}</td>`;
+    tbody.appendChild(trReforma);
+
+    // Verdict
+    const diff = Math.abs(rows[0].total - rows[1].total);
+    const cheaper = best === 0 ? 'o Simples Nacional' : 'o Lucro Presumido';
+    const verdict = $('verdict');
+    let reformNote;
+    if (reforma.total < rows[best].total){
+      reformNote = `Na projeção de IVA pleno (2033), com os créditos informados, a carga cai para <span class="savings">${fmtBRL(reforma.total)}</span> — vale reavaliar o regime à medida que a reforma avança, principalmente se boa parte dos seus custos gerar crédito.`;
+    } else {
+      reformNote = `Na projeção de IVA pleno (2033), a carga estimada sobe para <span class="savings negative">${fmtBRL(reforma.total)}</span> em relação à melhor opção de hoje — o efeito tende a ser menor se você conseguir aproveitar mais créditos sobre seus insumos.`;
+    }
+
+    verdict.innerHTML = `
+      <h3>Hoje, ${cheaper} sai mais barato para esta empresa</h3>
+      <p>Diferença mensal estimada entre os dois regimes atuais: <span class="savings">${fmtBRL(diff)}</span> (${fmtBRL(diff*12)} ao ano).</p>
+      <p>${reformNote}</p>
+      <p>O Simples Nacional segue protegido pela EC 132/2023 durante toda a transição; a diferença real a partir de 2027 depende de você optar por apurar o IBS/CBS dentro ou "por fora" do DAS — isso vale mais a pena quando seus clientes são empresas que aproveitam o crédito.</p>
+    `;
+
+    // Breakdowns
+    $('bkSimplesBody').innerHTML = `
+      <div class="bk-row"><span>Anexo utilizado</span><span>${simples.anexoUsado}${simples.fatorR!==null ? ' (Fator R: '+fmtPct(simples.fatorR*100)+')' : ''}</span></div>
+      <div class="bk-row"><span>Alíquota nominal da faixa</span><span>${fmtPct(simples.aliqNominal*100)}</span></div>
+      <div class="bk-row"><span>Parcela a deduzir (anual)</span><span>${fmtBRL(simples.deduz)}</span></div>
+      <div class="bk-row"><span>Alíquota efetiva</span><span>${fmtPct(simples.aliqEfetiva*100)}</span></div>
+      ${simples.cppExtra ? `<div class="bk-row"><span>CPP patronal (Anexo IV, à parte)</span><span>${fmtBRL(simples.cppExtra)}</span></div>` : ''}
+      <div class="bk-row"><span>Total mensal (DAS)</span><span>${fmtBRL(simples.total)}</span></div>
+    `;
+
+    $('bkPresumidoBody').innerHTML = `
+      <div class="bk-row"><span>Base de presunção — IRPJ (${fmtPct(presumido.presIRPJ*100)})</span><span>${fmtBRL(presumido.irpj)}</span></div>
+      <div class="bk-row"><span>Adicional de IRPJ (10% acima de R$ 20.000)</span><span>${fmtBRL(presumido.adicional)}</span></div>
+      <div class="bk-row"><span>CSLL (${fmtPct(presumido.presCSLL*100)} de base)</span><span>${fmtBRL(presumido.csll)}</span></div>
+      <div class="bk-row"><span>PIS (0,65% da receita)</span><span>${fmtBRL(presumido.pis)}</span></div>
+      <div class="bk-row"><span>COFINS (3% da receita)</span><span>${fmtBRL(presumido.cofins)}</span></div>
+      <div class="bk-row"><span>${presumido.servico ? 'ISS' : 'ICMS'} estimado</span><span>${fmtBRL(presumido.icmsIss)}</span></div>
+      <div class="bk-row"><span>CPP + encargos sobre a folha</span><span>${fmtBRL(presumido.cpp)}</span></div>
+      <div class="bk-row"><span>Total mensal</span><span>${fmtBRL(presumido.total)}</span></div>
+    `;
+
+    $('bkReformaBody').innerHTML = `
+      <div class="bk-row"><span>Débito de IBS/CBS sobre a receita</span><span>${fmtBRL(reforma.debito)}</span></div>
+      <div class="bk-row"><span>Crédito sobre insumos (${creditoPctVal}% da receita)</span><span>-${fmtBRL(reforma.credito)}</span></div>
+      <div class="bk-row"><span>IBS/CBS líquido</span><span>${fmtBRL(reforma.ivaLiquido)}</span></div>
+      <div class="bk-row"><span>IRPJ + adicional</span><span>${fmtBRL(reforma.irpj + reforma.adicional)}</span></div>
+      <div class="bk-row"><span>CSLL</span><span>${fmtBRL(reforma.csll)}</span></div>
+      <div class="bk-row"><span>CPP + encargos sobre a folha</span><span>${fmtBRL(reforma.cpp)}</span></div>
+      <div class="bk-row"><span>Total mensal projetado</span><span>${fmtBRL(reforma.total)}</span></div>
+    `;
+
+    $('results').style.display = 'block';
+    $('results').scrollIntoView({ behavior:'smooth', block:'start' });
+  });
+})();
+</script>
+</body>
+</html>
