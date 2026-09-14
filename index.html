@@ -526,7 +526,7 @@
     </div>
 
     <div class="tab-panel" id="panelCarga">
-      <div class="verdict" id="verdict"></div>
+      <div class="verdict" id="verdict" aria-live="polite"></div>
 
       <table class="compare" id="compareTable">
         <caption>Carga tributária mensal estimada, por regime</caption>
@@ -564,7 +564,7 @@
     </div>
 
     <div class="tab-panel" id="panelCredito" hidden>
-      <div class="verdict" id="verdictCredito"></div>
+      <div class="verdict" id="verdictCredito" aria-live="polite"></div>
 
       <table class="compare" id="creditTable">
         <caption>Crédito tributário mensal, por regime</caption>
@@ -641,6 +641,16 @@
             <option value="sim">Apura o IBS/CBS por fora (híbrido)</option>
           </select>
         </div>
+
+        <div class="field span2" id="repasseHibridoField" style="display:none;">
+          <label for="repasseHibridoNao">Se o fornecedor do Simples continuar 100% no DAS, quanto do IVA pleno ele ainda repassa como crédito (%)
+            <span class="hint">Estimativa própria, ajustável — a regulamentação definitiva da apropriação de crédito no Simples ainda não está fechada</span>
+          </label>
+          <div class="range-row">
+            <input type="range" id="repasseHibridoNao" min="0" max="100" value="60">
+            <output id="repasseHibridoNaoOut">60%</output>
+          </div>
+        </div>
       </div>
 
       <div class="btn-row">
@@ -648,7 +658,7 @@
       </div>
 
       <div id="compradorResults" style="display:none; margin-top:28px;">
-        <div class="verdict" id="verdictComprador"></div>
+        <div class="verdict" id="verdictComprador" aria-live="polite"></div>
         <table class="compare" id="compradorTable">
           <caption>Custo líquido estimado, por regime do fornecedor</caption>
           <thead>
@@ -697,9 +707,12 @@
 
   function faixaFor(table, rbt12){
     for (const [limit, aliq, deduz] of table){
-      if (rbt12 <= limit) return { limit, aliq, deduz };
+      if (rbt12 <= limit) return { limit, aliq, deduz, acimaDoTeto: false };
     }
-    return table[table.length - 1].map ? null : { limit: table[5][0], aliq: table[5][1], deduz: table[5][2] };
+    // RBT12 acima de R$ 4.800.000: fora do teto do Simples. Usamos a última
+    // faixa como referência aproximada e sinalizamos para exibir o aviso.
+    const last = table[table.length - 1];
+    return { limit: last[0], aliq: last[1], deduz: last[2], acimaDoTeto: true };
   }
 
   function calcSimples(anexoInput, setor, rbt12, faturamentoMensal, folha12){
@@ -720,7 +733,7 @@
     }
     return {
       anexoUsado, fatorR, aliqNominal: f.aliq, deduz: f.deduz, aliqEfetiva,
-      dasMensal, cppExtra, total: dasMensal
+      dasMensal, cppExtra, total: dasMensal, acimaDoTeto: f.acimaDoTeto
     };
   }
 
@@ -818,7 +831,7 @@
   }
 
   // ---------- Simulação do comprador/contratante ----------
-  function calcComprador(valor, tipoOperacao, icmsCompraPct, momento, fornecedorHibrido, repasseSimplesPct, ivaRateVal){
+  function calcComprador(valor, tipoOperacao, icmsCompraPct, momento, fornecedorHibrido, repasseSimplesPct, ivaRateVal, repasseHibridoNaoPct){
     const produto = tipoOperacao === 'produto';
     let creditoSimples, creditoPresumido, creditoRPA;
 
@@ -832,7 +845,7 @@
       const ivaLiquidoRate = ivaRateVal / 100;
       creditoRPA = valor * ivaLiquidoRate;
       creditoPresumido = valor * ivaLiquidoRate;
-      creditoSimples = fornecedorHibrido ? valor * ivaLiquidoRate : valor * ivaLiquidoRate * 0.6;
+      creditoSimples = fornecedorHibrido ? valor * ivaLiquidoRate : valor * ivaLiquidoRate * (repasseHibridoNaoPct / 100);
     }
 
     return {
@@ -880,10 +893,15 @@
   tabBtnCredito.addEventListener('click', () => showTab('credito'));
   tabBtnComprador.addEventListener('click', () => showTab('comprador'));
 
-  const momentoCompra = $('momentoCompra'), hibridoField = $('hibridoField');
+  const momentoCompra = $('momentoCompra'), hibridoField = $('hibridoField'), repasseHibridoField = $('repasseHibridoField');
   momentoCompra.addEventListener('change', () => {
-    hibridoField.style.display = momentoCompra.value === 'reforma' ? 'flex' : 'none';
+    const isReforma = momentoCompra.value === 'reforma';
+    hibridoField.style.display = isReforma ? 'flex' : 'none';
+    repasseHibridoField.style.display = isReforma ? 'flex' : 'none';
   });
+
+  const repasseHibridoNao = $('repasseHibridoNao'), repasseHibridoNaoOut = $('repasseHibridoNaoOut');
+  repasseHibridoNao.addEventListener('input', () => repasseHibridoNaoOut.textContent = repasseHibridoNao.value + '%');
 
   $('calcBtn').addEventListener('click', () => {
     const setor = setorSel.value;
@@ -913,7 +931,7 @@
 
     // Comparação hoje: Simples, Presumido e Lucro Real (RPA)
     const rows = [
-      { label: `Simples Nacional (Anexo ${simples.anexoUsado})`, total: simples.total, aliq: simples.aliqEfetiva },
+      { label: `Simples Nacional (Anexo ${simples.anexoUsado})${simples.acimaDoTeto ? ' ⚠ acima do teto' : ''}`, total: simples.total, aliq: simples.aliqEfetiva },
       { label: 'Lucro Presumido', total: presumido.total, aliq: presumido.total / faturamentoMensal },
       { label: 'Lucro Real (RPA)', total: rpa.total, aliq: rpa.total / faturamentoMensal },
     ];
@@ -944,7 +962,14 @@
       reformNote = `Na projeção de IVA pleno (2033), a carga estimada sobe para <span class="savings negative">${fmtBRL(reforma.total)}</span> em relação à melhor opção de hoje — o efeito tende a ser menor se você conseguir aproveitar mais créditos sobre seus insumos.`;
     }
 
+    const tetoWarning = simples.acimaDoTeto ? `
+      <div class="reform-note" style="border-left-color:var(--brick); margin:0 0 22px;">
+        <strong>Atenção:</strong> a receita bruta dos últimos 12 meses informada (${fmtBRL(rbt12)}) está acima do teto do Simples Nacional (R$ 4.800.000). Nesse caso a empresa já estaria excluída do regime (ou sujeita a exclusão a partir do ano seguinte, se o excesso for de até 20%) — o valor mostrado abaixo para o Simples é apenas uma referência com a alíquota máxima da tabela, não um cálculo válido. Confirme a situação com um contador.
+      </div>
+    ` : '';
+
     verdict.innerHTML = `
+      ${tetoWarning}
       <h3>Hoje, ${cheaper} sai mais barato para esta empresa</h3>
       <p>Diferença mensal estimada para a segunda opção mais barata: <span class="savings">${fmtBRL(diff)}</span> (${fmtBRL(diff*12)} ao ano).</p>
       <p>${reformNote}</p>
@@ -1046,6 +1071,7 @@
     const hibrido = $('fornecedorHibrido').value === 'sim';
     const repasseSimplesPct = parseFloat(repasseSimples.value);
     const ivaRateVal = parseFloat(ivaRate.value);
+    const repasseHibridoNaoPct = parseFloat(repasseHibridoNao.value);
 
     if (valor <= 0){
       alert('Informe o valor contratado para calcular.');
@@ -1070,7 +1096,7 @@
       return;
     }
 
-    const r = calcComprador(valor, tipoOperacao, icmsCompraPct, momento, hibrido, repasseSimplesPct, ivaRateVal);
+    const r = calcComprador(valor, tipoOperacao, icmsCompraPct, momento, hibrido, repasseSimplesPct, ivaRateVal, repasseHibridoNaoPct);
     const rows = [
       { label: 'Simples Nacional', ...r.simples },
       { label: 'Lucro Presumido', ...r.presumido },
