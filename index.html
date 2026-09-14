@@ -546,7 +546,7 @@
       </details>
 
       <details class="breakdown" id="bkPresumido">
-        <summary>Ver como o Lucro Presumido foi calculado</summary>
+        <summary>Ver como o Lucro Presumido foi calculated</summary>
         <div id="bkPresumidoBody"></div>
       </details>
 
@@ -707,12 +707,10 @@
 
   function faixaFor(table, rbt12){
     for (const [limit, aliq, deduz] of table){
-      if (rbt12 <= limit) return { limit, aliq, deduz, acimaDoTeto: false };
+      if (rbt12 <= limit) return { limit, aliq, deduz, acimaDoTeto: false, acimaDoSublimite: rbt12 > 3600000 };
     }
-    // RBT12 acima de R$ 4.800.000: fora do teto do Simples. Usamos a última
-    // faixa como referência aproximada e sinalizamos para exibir o aviso.
     const last = table[table.length - 1];
-    return { limit: last[0], aliq: last[1], deduz: last[2], acimaDoTeto: true };
+    return { limit: last[0], aliq: last[1], deduz: last[2], acimaDoTeto: true, acimaDoSublimite: true };
   }
 
   function calcSimples(anexoInput, setor, rbt12, faturamentoMensal, folha12){
@@ -733,7 +731,7 @@
     }
     return {
       anexoUsado, fatorR, aliqNominal: f.aliq, deduz: f.deduz, aliqEfetiva,
-      dasMensal, cppExtra, total: dasMensal, acimaDoTeto: f.acimaDoTeto
+      dasMensal, cppExtra, total: dasMensal, acimaDoTeto: f.acimaDoTeto, acimaDoSublimite: f.acimaDoSublimite
     };
   }
 
@@ -747,6 +745,7 @@
     const baseCSLL = faturamentoMensal * presCSLL;
 
     const irpj = baseIRPJ * 0.15;
+    // CORREÇÃO: O adicional de 10% incide sobre a BASE PRESUMIDA MENSAL que exceder R$ 20.000,00
     const adicional = Math.max(0, baseIRPJ - 20000) * 0.10;
     const csll = baseCSLL * 0.09;
     const pis = faturamentoMensal * 0.0065;
@@ -765,6 +764,7 @@
 
     const baseLucro = faturamentoMensal * margem;
     const irpj = baseLucro * 0.15;
+    // CORREÇÃO: O adicional de 10% incide sobre a BASE REAL MENSAL que exceder R$ 20.000,00
     const adicional = Math.max(0, baseLucro - 20000) * 0.10;
     const csll = baseLucro * 0.09;
 
@@ -810,18 +810,18 @@
     const b2b = pctB2BVal / 100;
 
     // Crédito tomado nas compras (o que a própria empresa abate)
-    const tomadoSimples = 0; // Simples normalmente não se apropria de créditos de ICMS/PIS/COFINS
-    const tomadoPresumido = servico ? 0 : comprasComCredito * (icmsIssPct / 100); // só ICMS; PIS/COFINS é cumulativo no Presumido
-    const tomadoRPA = rpa.pisCredito + rpa.cofinsCredito + (servico ? 0 : rpa.icmsCredito); // não cumulativo pleno, já hoje
-    const tomadoReforma = reforma.credito; // IBS/CBS não cumulativo pleno
+    const tomadoSimples = 0;
+    const tomadoPresumido = servico ? 0 : comprasComCredito * (icmsIssPct / 100);
+    const tomadoRPA = rpa.pisCredito + rpa.cofinsCredito + (servico ? 0 : rpa.icmsCredito);
+    const tomadoReforma = reforma.credito;
 
-    // Crédito repassado ao cliente PJ do regime normal (pondera pela fatia B2B)
+    // Crédito repassado ao cliente PJ do regime normal
     const repassadoSimples = simples.total * (repasseSimplesPct / 100) * b2b;
-    const repassadoPresumido = (servico ? 0 : presumido.icmsIss) * b2b; // só ICMS é repassável; PIS/COFINS cumulativo não gera crédito
+    const repassadoPresumido = (servico ? 0 : presumido.icmsIss) * b2b;
     const debitoRPA = faturamentoMensal * (0.0165 + 0.076) + (servico ? 0 : faturamentoMensal * (icmsIssPct / 100));
-    const repassadoRPA = debitoRPA * b2b; // já não cumulativo hoje: repassa o imposto destacado por inteiro
+    const repassadoRPA = debitoRPA * b2b;
     const debitoReforma = faturamentoMensal * (ivaRateVal / 100);
-    const repassadoReforma = debitoReforma * b2b; // IBS/CBS pleno: 100% do destacado é creditável
+    const repassadoReforma = debitoReforma * b2b;
 
     return {
       tomadoSimples, tomadoPresumido, tomadoRPA, tomadoReforma,
@@ -905,7 +905,7 @@
 
   $('calcBtn').addEventListener('click', () => {
     const setor = setorSel.value;
-    const anexo = anexoSel.value;
+    let anexo = anexoSel.value;
     const faturamentoMensal = parseNum($('faturamentoMensal').value) || 0;
     let rbt12 = parseNum($('rbt12').value);
     if (!rbt12) rbt12 = faturamentoMensal * 12;
@@ -924,14 +924,19 @@
     }
 
     const simples = calcSimples(anexo, setor, rbt12, faturamentoMensal, folha12);
+    // CORREÇÃO: Sincroniza o dropdown visual se houver alteração pelo Fator R
+    if (simples.anexoUsado !== anexo) {
+      anexoSel.value = simples.anexoUsado;
+    }
+
     const presumido = calcPresumido(setor, faturamentoMensal, folhaMensal, icmsIssPct, encargosFolhaPct);
     const comprasComCredito = faturamentoMensal * (creditoPctVal / 100);
     const rpa = calcRPA(setor, faturamentoMensal, folhaMensal, encargosFolhaPct, icmsIssPct, margemRealPct, comprasComCredito);
     const reforma = calcReforma(faturamentoMensal, folhaMensal, encargosFolhaPct, rpa, creditoPctVal, ivaRateVal);
 
-    // Comparação hoje: Simples, Presumido e Lucro Real (RPA)
+    // Comparação hoje
     const rows = [
-      { label: `Simples Nacional (Anexo ${simples.anexoUsado})${simples.acimaDoTeto ? ' ⚠ acima do teto' : ''}`, total: simples.total, aliq: simples.aliqEfetiva },
+      { label: `Simples Nacional (Anexo ${simples.anexoUsado})${simples.acimaDoTeto ? ' ⚠ acima do teto' : (simples.acimaDoSublimite ? ' ⚠ acima do sublimite' : '')}`, total: simples.total, aliq: simples.aliqEfetiva },
       { label: 'Lucro Presumido', total: presumido.total, aliq: presumido.total / faturamentoMensal },
       { label: 'Lucro Real (RPA)', total: rpa.total, aliq: rpa.total / faturamentoMensal },
     ];
@@ -962,11 +967,20 @@
       reformNote = `Na projeção de IVA pleno (2033), a carga estimada sobe para <span class="savings negative">${fmtBRL(reforma.total)}</span> em relação à melhor opção de hoje — o efeito tende a ser menor se você conseguir aproveitar mais créditos sobre seus insumos.`;
     }
 
-    const tetoWarning = simples.acimaDoTeto ? `
-      <div class="reform-note" style="border-left-color:var(--brick); margin:0 0 22px;">
-        <strong>Atenção:</strong> a receita bruta dos últimos 12 meses informada (${fmtBRL(rbt12)}) está acima do teto do Simples Nacional (R$ 4.800.000). Nesse caso a empresa já estaria excluída do regime (ou sujeita a exclusão a partir do ano seguinte, se o excesso for de até 20%) — o valor mostrado abaixo para o Simples é apenas uma referência com a alíquota máxima da tabela, não um cálculo válido. Confirme a situação com um contador.
-      </div>
-    ` : '';
+    let tetoWarning = '';
+    if (simples.acimaDoTeto) {
+      tetoWarning = `
+        <div class="reform-note" style="border-left-color:var(--brick); margin:0 0 22px;">
+          <strong>Atenção:</strong> a receita bruta acumulada (${fmtBRL(rbt12)}) ultrapassa o teto do Simples Nacional (R$ 4.800.000). A empresa deve ser excluída do regime. O valor exibido é apenas referência.
+        </div>
+      `;
+    } else if (simples.acimaDoSublimite) {
+      tetoWarning = `
+        <div class="reform-note" style="border-left-color:var(--brass-dark); margin:0 0 22px;">
+          <strong>Atenção ao Sublimite:</strong> a receita acumulada (${fmtBRL(rbt12)}) ultrapassou o sublimite de R$ 3.600.000. O ICMS e/ou ISS devem ser recolhidos "por fora" do DAS, segundo as regras do regime normal.
+        </div>
+      `;
+    }
 
     verdict.innerHTML = `
       ${tetoWarning}
@@ -987,9 +1001,10 @@
     `;
 
     $('bkPresumidoBody').innerHTML = `
-      <div class="bk-row"><span>Base de presunção — IRPJ (${fmtPct(presumido.presIRPJ*100)})</span><span>${fmtBRL(presumido.irpj)}</span></div>
-      <div class="bk-row"><span>Adicional de IRPJ (10% acima de R$ 20.000)</span><span>${fmtBRL(presumido.adicional)}</span></div>
-      <div class="bk-row"><span>CSLL (${fmtPct(presumido.presCSLL*100)} de base)</span><span>${fmtBRL(presumido.csll)}</span></div>
+      <div class="bk-row"><span>Base de presunção — IRPJ (${fmtPct(presumido.presIRPJ*100)})</span><span>${fmtBRL(faturamentoMensal * presumido.presIRPJ)}</span></div>
+      <div class="bk-row"><span>IRPJ (15% da base)</span><span>${fmtBRL(presumido.irpj)}</span></div>
+      <div class="bk-row"><span>Adicional de IRPJ (10% sobre a base que excede R$ 20.000)</span><span>${fmtBRL(presumido.adicional)}</span></div>
+      <div class="bk-row"><span>CSLL (${fmtPct(presumido.presCSLL*100)} de base / 9%)</span><span>${fmtBRL(presumido.csll)}</span></div>
       <div class="bk-row"><span>PIS (0,65% da receita)</span><span>${fmtBRL(presumido.pis)}</span></div>
       <div class="bk-row"><span>COFINS (3% da receita)</span><span>${fmtBRL(presumido.cofins)}</span></div>
       <div class="bk-row"><span>${presumido.servico ? 'ISS' : 'ICMS'} estimado</span><span>${fmtBRL(presumido.icmsIss)}</span></div>
@@ -1000,10 +1015,10 @@
     $('bkRPABody').innerHTML = `
       <div class="bk-row"><span>Base de lucro real (${fmtPct(rpa.margem*100)} de margem informada)</span><span>${fmtBRL(rpa.baseLucro)}</span></div>
       <div class="bk-row"><span>IRPJ (15% da base)</span><span>${fmtBRL(rpa.irpj)}</span></div>
-      <div class="bk-row"><span>Adicional de IRPJ (10% acima de R$ 20.000)</span><span>${fmtBRL(rpa.adicional)}</span></div>
+      <div class="bk-row"><span>Adicional de IRPJ (10% sobre a base que excede R$ 20.000)</span><span>${fmtBRL(rpa.adicional)}</span></div>
       <div class="bk-row"><span>CSLL (9% da base)</span><span>${fmtBRL(rpa.csll)}</span></div>
-      <div class="bk-row"><span>PIS não cumulativo (1,65%, já descontado o crédito de ${fmtBRL(rpa.pisCredito)})</span><span>${fmtBRL(rpa.pis)}</span></div>
-      <div class="bk-row"><span>COFINS não cumulativo (7,6%, já descontado o crédito de ${fmtBRL(rpa.cofinsCredito)})</span><span>${fmtBRL(rpa.cofins)}</span></div>
+      <div class="bk-row"><span>PIS não cumulativo (1,65%, líquido do crédito de ${fmtBRL(rpa.pisCredito)})</span><span>${fmtBRL(rpa.pis)}</span></div>
+      <div class="bk-row"><span>COFINS não cumulativo (7,6%, líquido do crédito de ${fmtBRL(rpa.cofinsCredito)})</span><span>${fmtBRL(rpa.cofins)}</span></div>
       <div class="bk-row"><span>${rpa.servico ? 'ISS estimado (cumulativo)' : 'ICMS não cumulativo (líquido do crédito)'}</span><span>${fmtBRL(rpa.icmsIss)}</span></div>
       <div class="bk-row"><span>CPP + encargos sobre a folha</span><span>${fmtBRL(rpa.cpp)}</span></div>
       <div class="bk-row"><span>Total mensal</span><span>${fmtBRL(rpa.total)}</span></div>
