@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulador Tributário EVP</title>
+<title>Simulador Tributário & Decisão Comercial EVP</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -47,14 +47,13 @@
   }
 
   .wrap{
-    max-width: 900px;
+    max-width: 920px;
     margin: 0 auto;
     padding: 0 24px 96px;
     position: relative;
     z-index: 1;
   }
 
-  /* Header */
   header.doc{
     border-bottom: 2px solid var(--ink);
     padding: 40px 0 22px;
@@ -73,7 +72,7 @@
   h1.title{
     font-family: var(--serif);
     font-weight: 700;
-    font-size: clamp(34px, 5.5vw, 54px);
+    font-size: clamp(32px, 5vw, 50px);
     line-height: 1.05;
     margin: 0 0 12px;
     letter-spacing: -0.01em;
@@ -83,8 +82,8 @@
     color: var(--brass-dark);
   }
   .subtitle{
-    max-width: 60ch;
-    font-size: 16.5px;
+    max-width: 65ch;
+    font-size: 16px;
     color: var(--ink-soft);
     margin: 0;
   }
@@ -99,7 +98,6 @@
   }
   .doc-meta strong{ color: var(--ink); font-weight: 500; }
 
-  /* Sections */
   section.sheet{
     border-top: 1px solid var(--rule-strong);
     padding-top: 28px;
@@ -129,10 +127,9 @@
     font-size: 13.5px;
     color: var(--ink-soft);
     margin: -10px 0 22px 46px;
-    max-width: 56ch;
+    max-width: 62ch;
   }
 
-  /* Form Grid */
   .grid{
     display:grid;
     grid-template-columns: 1fr 1fr;
@@ -204,8 +201,7 @@
   button.calc:hover{ background: var(--brass-dark); }
   .btn-caption{ font-size: 13px; color: var(--ink-soft); }
 
-  /* Results and Tabs */
-  #results{ display:none; }
+  #results{ display: block; margin-top: 36px; }
 
   .tabs{
     display:flex;
@@ -216,12 +212,12 @@
   .tab-btn{
     font-family: var(--sans);
     font-weight: 500;
-    font-size: 14px;
+    font-size: 13.5px;
     background: var(--paper);
     color: var(--ink-soft);
     border: 1px solid var(--rule-strong);
     border-bottom: none;
-    padding: 10px 18px 12px;
+    padding: 10px 16px 12px;
     cursor: pointer;
     position: relative;
     top: 1px;
@@ -236,7 +232,7 @@
   .tab-panel{
     border: 1px solid var(--ink);
     border-top-color: var(--ink);
-    padding: 26px 24px 6px;
+    padding: 26px 24px 24px;
     background: var(--paper-raised);
   }
   .verdict{
@@ -269,7 +265,6 @@
     color: var(--forest);
     font-weight: 600;
   }
-  .verdict .savings.negative{ color: var(--brick); }
 
   table.compare{
     width: 100%;
@@ -301,7 +296,7 @@
   table.compare td.num, table.compare th.num{ font-family: var(--mono); }
   table.compare tr.best td{ font-weight: 600; color: var(--forest); }
   table.compare tr.best td:first-child::after{
-    content: " ◆ melhor opção";
+    content: " ◆ recomendação";
     font-family: var(--sans);
     font-weight: 400;
     font-size: 11.5px;
@@ -365,14 +360,14 @@
 
   <header class="doc">
     <div class="doc-top">
-      <span>EVP · PLANEJAMENTO TRIBUTÁRIO</span>
+      <span>EVP · INTELIGÊNCIA TRIBUTÁRIA E PRECIFICAÇÃO</span>
       <span id="today"></span>
     </div>
-    <h1 class="title">Simulador<br>Tributário <em>EVP</em></h1>
-    <p class="subtitle">Análise tributária completa: compare o Simples Nacional, Lucro Presumido e Lucro Real, com impacto da Reforma Tributária (IBS/CBS) e simulação de fornecedores de matéria-prima.</p>
+    <h1 class="title">Simulador Tributário<br>&amp; Decisão Comercial <em>EVP</em></h1>
+    <p class="subtitle">Avalie qualquer nota fiscal ou contrato (de R$ 1,00 a bilhões): simule a melhor opção fiscal para a sua receita, o impacto de crédito nos seus clientes e a vantagem real em compras B2B.</p>
     <div class="doc-meta">
-      <span>Base legal: <strong>EC 132/2023 · LC 214/2025</strong></span>
-      <span>Transição: <strong>2026 – 2033</strong></span>
+      <span>Base legal: <strong>EC 132/2023 · LC 123/2006</strong></span>
+      <span>Escopo: <strong>B2B &amp; B2C / Serviços &amp; Insumos</strong></span>
       <span>Cálculo: <strong>100% no navegador</strong></span>
     </div>
   </header>
@@ -380,14 +375,14 @@
   <section class="sheet" id="form-section">
     <div class="sheet-head">
       <span class="sheet-num">01</span>
-      <h2>A empresa</h2>
+      <h2>A sua empresa (Receitas &amp; Faturamento)</h2>
     </div>
-    <p class="sheet-note">Informe os valores mensais ou acumulados. Se você é único sócio e não tem funcionários CLT, informe seu Pró-Labore bruto no campo da folha para considerar o Fator R do Anexo III.</p>
+    <p class="sheet-note">Informe os dados das suas vendas ou prestações de serviço. Se for único sócio sem funcionários CLT, coloque o valor do seu Pró-Labore para validar a redução do Fator R (Anexo III).</p>
 
     <div class="grid">
       <div class="field">
         <label for="setor">Atividade principal
-          <span class="hint">Define a presunção de lucro e o anexo do Simples</span>
+          <span class="hint">Define a presunção e o enquadramento inicial</span>
         </label>
         <select id="setor">
           <option value="servicos_geral">Serviços em geral / Apoio Administrativo</option>
@@ -399,34 +394,36 @@
 
       <div class="field">
         <label for="anexo">Anexo do Simples Nacional
-          <span class="hint">Ajustado automaticamente via Fator R (III / V)</span>
+          <span class="hint">Ajustado via Fator R (III / V)</span>
         </label>
         <select id="anexo">
           <option value="III">Anexo III — Serviços (Alíquota inicial 6%)</option>
           <option value="V">Anexo V — Serviços (Sem folha / Fator R &lt; 28%)</option>
           <option value="I">Anexo I — Comércio</option>
           <option value="II">Anexo II — Indústria</option>
-          <option value="IV">Anexo IV — Serviços (sem CPP na alíquota)</option>
+          <option value="IV">Anexo IV — Serviços (Sem CPP inclusa)</option>
         </select>
       </div>
 
       <div class="field">
-        <label for="faturamentoMensal">Faturamento bruto mensal médio (R$)</label>
-        <input type="text" inputmode="numeric" id="faturamentoMensal" placeholder="Ex.: 4204" value="4204">
+        <label for="faturamentoMensal">Faturamento bruto mensal (R$)
+          <span class="hint">Funciona para qualquer valor (R$ 1,00 a bilhões)</span>
+        </label>
+        <input type="text" inputmode="numeric" id="faturamentoMensal" value="4204">
       </div>
 
       <div class="field">
-        <label for="rbt12">Receita bruta — últimos 12 meses (R$)
-          <span class="hint">Deixe em branco para calcular 12× o valor mensal</span>
+        <label for="rbt12">Receita acumulada — 12 meses (R$)
+          <span class="hint">Deixe em branco para usar 12× o valor mensal</span>
         </label>
         <input type="text" inputmode="numeric" id="rbt12" placeholder="Ex.: 50448">
       </div>
 
       <div class="field">
-        <label for="folhaMensal">Folha de pagamento / Pró-Labore mensal bruto (R$)
-          <span class="hint">Informe o Pró-Labore (min. 28% da receita) para garantir o Anexo III</span>
+        <label for="folhaMensal">Folha de pagamento / Pró-Labore mensal (R$)
+          <span class="hint">Mínimo de 28% do faturamento para travar Anexo III</span>
         </label>
-        <input type="text" inputmode="numeric" id="folhaMensal" placeholder="Ex.: 1178" value="1178">
+        <input type="text" inputmode="numeric" id="folhaMensal" value="1178">
       </div>
 
       <div class="field">
@@ -441,28 +438,28 @@
   <section class="sheet" id="assumptions-section">
     <div class="sheet-head">
       <span class="sheet-num">02</span>
-      <h2>Premissas do Lucro Presumido e da Reforma Tributária</h2>
+      <h2>Premissas estaduais, municipais e reforma (IBS/CBS)</h2>
     </div>
-    <p class="sheet-note">Ajuste as premissas estaduais/municipais e as projeções do IVA Dual (IBS + CBS) para 2033.</p>
+    <p class="sheet-note">Ajuste os parâmetros de tributação indireta e premissas de repasse de crédito aos seus clientes.</p>
 
     <div class="grid">
       <div class="field">
-        <label for="icmsIss">Alíquota de ICMS ou ISS aplicável (%)
-          <span class="hint">ISS do município (ex.: SP ~ 2% a 5%) ou ICMS estadual</span>
+        <label for="icmsIss">Alíquota de ICMS ou ISS local (%)
+          <span class="hint">ISS do município (ex.: 2% a 5%) ou ICMS estadual</span>
         </label>
         <input type="text" inputmode="decimal" id="icmsIss" value="2">
       </div>
 
       <div class="field">
         <label for="encargosFolha">Encargos patronais sobre a folha no Presumido (%)
-          <span class="hint">INSS patronal + RAT + Terceiros (aprox. 28%)</span>
+          <span class="hint">INSS patronal + RAT + Terceiros (~28%)</span>
         </label>
         <input type="text" inputmode="decimal" id="encargosFolha" value="28">
       </div>
 
       <div class="field span2">
-        <label for="creditoPct">Parcela das compras/insumos com direito a crédito (%)
-          <span class="hint">Compras de insumos, matérias-primas ou serviços de fornecedores do regime normal</span>
+        <label for="creditoPct">Insumos/Serviços tomados com direito a crédito de IVA (%)
+          <span class="hint">Porcentagem de custos operacionais contratados no regime normal</span>
         </label>
         <div class="range-row">
           <input type="range" id="creditoPct" min="0" max="80" value="40">
@@ -472,14 +469,14 @@
 
       <div class="field">
         <label for="margemReal">Margem de lucro real estimada (%)
-          <span class="hint">Necessária para apuração no Lucro Real (RPA)</span>
+          <span class="hint">Utilizada na projeção do Lucro Real (RPA)</span>
         </label>
         <input type="text" inputmode="decimal" id="margemReal" value="15">
       </div>
 
       <div class="field span2">
-        <label for="ivaRate">Alíquota de referência do IVA Dual (CBS + IBS) em regime pleno (%)
-          <span class="hint">Estimativa do IVA neutro para 2033</span>
+        <label for="ivaRate">Alíquota de referência do IVA Dual (CBS + IBS) em 2033 (%)
+          <span class="hint">Alíquota neutra estimada para o IVA Pleno</span>
         </label>
         <div class="range-row">
           <input type="range" id="ivaRate" min="20" max="30" step="0.1" value="26.5">
@@ -488,8 +485,8 @@
       </div>
 
       <div class="field span2">
-        <label for="pctB2B">Parcela das suas vendas/prestações para clientes PJ (%)
-          <span class="hint">Clientes do regime normal que se apropriam do crédito da sua nota</span>
+        <label for="pctB2B">Parcela das suas vendas para clientes PJ / B2B (%)
+          <span class="hint">Clientes corporativos que usam a nota para tomar crédito</span>
         </label>
         <div class="range-row">
           <input type="range" id="pctB2B" min="0" max="100" value="40">
@@ -498,8 +495,8 @@
       </div>
 
       <div class="field span2">
-        <label for="repasseSimples">Quanto da sua alíquota do DAS o cliente PJ aproveita como crédito (%)
-          <span class="hint">Estimativa do repasse proporcional de IBS/CBS dentro do DAS do Simples</span>
+        <label for="repasseSimples">Crédito repassado ao cliente dentro do DAS (%)
+          <span class="hint">Estimativa proporcional do IBS/CBS embutido na DAS do Simples</span>
         </label>
         <div class="range-row">
           <input type="range" id="repasseSimples" min="0" max="100" value="15">
@@ -510,130 +507,136 @@
 
     <div class="btn-row">
       <button class="calc" id="calcBtn">Calcular simulação</button>
-      <span class="btn-caption">Nada é enviado a servidor algum — o cálculo roda 100% no seu navegador.</span>
+      <span class="btn-caption">Rodando estaticamente no navegador.</span>
     </div>
   </section>
 
   <section class="sheet" id="results">
     <div class="sheet-head">
       <span class="sheet-num">03</span>
-      <h2>Resultado da simulação</h2>
+      <h2>Paineis de decisão e inteligência tributária</h2>
     </div>
 
     <div class="tabs" role="tablist">
-      <button class="tab-btn active" id="tabBtnCarga" role="tab" aria-selected="true">Carga tributária</button>
-      <button class="tab-btn" id="tabBtnCredito" role="tab" aria-selected="false">Créditos repassados ao cliente</button>
-      <button class="tab-btn" id="tabBtnMateriaPrima" role="tab" aria-selected="false">Análise de Fornecedores / Matéria-Prima</button>
+      <button class="tab-btn active" id="tabBtnCarga" role="tab" aria-selected="true">1. Carga tributária da sua receita</button>
+      <button class="tab-btn" id="tabBtnCredito" role="tab" aria-selected="false">2. Créditos repassados (Vendas B2B vs B2C)</button>
+      <button class="tab-btn" id="tabBtnMateriaPrima" role="tab" aria-selected="false">3. Compras &amp; Contratações B2B (Análise de Fornecedores)</button>
     </div>
 
-    <!-- Painel 1: Carga Tributária -->
+    <!-- Painel 1: Carga da Empresa -->
     <div class="tab-panel" id="panelCarga">
-      <div class="verdict" id="verdict" aria-live="polite"></div>
+      <div id="cargaContentHolder">
+        <p class="sheet-note" style="margin: 0 0 16px;">Preencha os valores da Seção 01 e clique no botão "Calcular simulação" acima para ver o parecer.</p>
+      </div>
+      <div id="cargaResultsDynamic" style="display:none;">
+        <div class="verdict" id="verdict" aria-live="polite"></div>
 
-      <table class="compare" id="compareTable">
-        <caption>Carga tributária mensal estimada, por regime</caption>
-        <thead>
-          <tr>
-            <th>Regime Tributário</th>
-            <th class="num">Carga Mensal (R$)</th>
-            <th class="num">Alíquota Efetiva (%)</th>
-          </tr>
-        </thead>
-        <tbody id="compareBody"></tbody>
-      </table>
+        <table class="compare" id="compareTable">
+          <caption>Comparativo mensal de imposto sobre vendas e serviços</caption>
+          <thead>
+            <tr>
+              <th>Regime Tributário</th>
+              <th class="num">Carga Mensal (R$)</th>
+              <th class="num">Alíquota Efetiva (%)</th>
+            </tr>
+          </thead>
+          <tbody id="compareBody"></tbody>
+        </table>
 
-      <details class="breakdown" id="bkSimples">
-        <summary>Ver como o Simples Nacional foi calculado</summary>
-        <div id="bkSimplesBody"></div>
-      </details>
+        <details class="breakdown" id="bkSimples">
+          <summary>Detalhamento do Simples Nacional</summary>
+          <div id="bkSimplesBody"></div>
+        </details>
 
-      <details class="breakdown" id="bkPresumido">
-        <summary>Ver como o Lucro Presumido foi calculado</summary>
-        <div id="bkPresumidoBody"></div>
-      </details>
+        <details class="breakdown" id="bkPresumido">
+          <summary>Detalhamento do Lucro Presumido</summary>
+          <div id="bkPresumidoBody"></div>
+        </details>
 
-      <details class="breakdown" id="bkRPA">
-        <summary>Ver como o Lucro Real (RPA) foi calculado</summary>
-        <div id="bkRPABody"></div>
-      </details>
+        <details class="breakdown" id="bkRPA">
+          <summary>Detalhamento do Lucro Real (RPA)</summary>
+          <div id="bkRPABody"></div>
+        </details>
 
-      <details class="breakdown" id="bkReforma">
-        <summary>Ver como a projeção com IVA pleno foi calculada</summary>
-        <div id="bkReformaBody"></div>
-      </details>
-
-      <p class="reform-note">A transição vale para todos até 2033. Empresas do Simples decidem em setembro/2026 se querem migrar para 2027, e — a partir de 2027 — podem apurar o IBS/CBS "por fora" do DAS para repassar 100% de crédito aos clientes sem sair do Simples Nacional.</p>
+        <details class="breakdown" id="bkReforma">
+          <summary>Detalhamento da Projeção IVA Pleno (2033)</summary>
+          <div id="bkReformaBody"></div>
+        </details>
+      </div>
     </div>
 
-    <!-- Painel 2: Créditos Repassados -->
+    <!-- Painel 2: Crédito Repassado -->
     <div class="tab-panel" id="panelCredito" hidden>
-      <div class="verdict" id="verdictCredito" aria-live="polite"></div>
+      <div id="creditoContentHolder">
+        <p class="sheet-note" style="margin: 0 0 16px;">Calcule a simulação no botão principal para ver a análise de repasse de créditos aos seus clientes.</p>
+      </div>
+      <div id="creditoResultsDynamic" style="display:none;">
+        <div class="verdict" id="verdictCredito" aria-live="polite"></div>
 
-      <table class="compare" id="creditTable">
-        <caption>Crédito tributário mensal gerado nas suas vendas, por regime</caption>
-        <thead>
-          <tr>
-            <th>Regime</th>
-            <th class="num">Crédito tomado nas compras</th>
-            <th class="num">Crédito repassado ao seu cliente PJ</th>
-          </tr>
-        </thead>
-        <tbody id="creditBody"></tbody>
-      </table>
+        <table class="compare" id="creditTable">
+          <caption>Crédito tributário mensal gerado nas suas vendas</caption>
+          <thead>
+            <tr>
+              <th>Regime</th>
+              <th class="num">Crédito tomado nas compras</th>
+              <th class="num">Crédito repassado ao seu cliente PJ</th>
+            </tr>
+          </thead>
+          <tbody id="creditBody"></tbody>
+        </table>
 
-      <details class="breakdown" id="bkCredito" open>
-        <summary>Como esses números foram calculados</summary>
-        <div id="bkCreditoBody"></div>
-      </details>
-
-      <p class="reform-note">"Crédito repassado" é o valor que o seu cliente PJ do regime normal utiliza para abater do imposto dele ao comprar de você. Quanto maior esse crédito, mais atrativa fica a sua nota fiscal comercialmente.</p>
+        <details class="breakdown" id="bkCredito" open>
+          <summary>Memória de Cálculo do Repasse</summary>
+          <div id="bkCreditoBody"></div>
+        </details>
+      </div>
     </div>
 
-    <!-- Painel 3: Matéria-Prima e Fornecedores -->
+    <!-- Painel 3: Compras & Contratações (INDEPENDENTE) -->
     <div class="tab-panel" id="panelMateriaPrima" hidden>
-      <p class="sheet-note" style="margin:0 0 20px;">Use esta aba para calcular o **custo líquido real de comprar matéria-prima/insumos** de diferentes fornecedores. O simulador calcula quanto de crédito tributário retorna para o seu caixa e qual desconto um fornecedor do Simples precisa dar para compensar a perda de crédito.</p>
+      <p class="sheet-note" style="margin:0 0 20px;">Utilize este módulo a qualquer momento para analisar **qualquer compra ou serviço contratado pela sua empresa** (softwares, consultorias, insumos, fretes ou máquinas). Descubra o custo líquido real e quanto de desconto pedir a fornecedores do Simples 100% DAS.</p>
 
       <div class="grid">
         <div class="field span2">
-          <label for="valorMP">Valor de tabela da compra de matéria-prima / insumos (R$)
-            <span class="hint">Considere o mesmo valor bruto para comparar a recuperação de crédito</span>
+          <label for="valorMP">Valor nominal do contrato / compra / serviço (R$)
+            <span class="hint">Funciona para qualquer valor de aquisição (R$ 1,00 a bilhões)</span>
           </label>
           <input type="text" inputmode="numeric" id="valorMP" value="50000">
         </div>
 
         <div class="field">
           <label for="suaEmpresaRegime">Sua empresa opera em qual regime?
-            <span class="hint">Define se o crédito de IVA abata o seu imposto</span>
+            <span class="hint">Define se você consegue utilizar o crédito para abater impostos</span>
           </label>
           <select id="suaEmpresaRegime">
-            <option value="normal">Regime Normal (Lucro Real / Presumido / IVA Pleno)</option>
+            <option value="normal">Regime Normal (Lucro Real / Presumido / IVA Dual)</option>
             <option value="simples">Simples Nacional (100% DAS)</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="repasseMPFornecedor">Se o fornecedor for do Simples 100% DAS, quanto de IVA ele repassa no DAS? (%)
-            <span class="hint">Estimativa do crédito parcial repassado (padrão: ~3%)</span>
+          <label for="repasseMPFornecedor">Se o fornecedor for do Simples 100% DAS, quanto ele repassa de crédito? (%)
+            <span class="hint">Repasse estimado no DAS (Padrão: ~3%)</span>
           </label>
           <input type="text" inputmode="decimal" id="repasseMPFornecedor" value="3.0">
         </div>
       </div>
 
       <div class="btn-row">
-        <button class="calc" id="calcMPBtn">Simular custo líquido do fornecedor</button>
+        <button class="calc" id="calcMPBtn">Simular custo líquido do contrato/fornecedor</button>
       </div>
 
       <div id="mpResults" style="display:none; margin-top:28px;">
         <div class="verdict" id="verdictMP" aria-live="polite"></div>
 
         <table class="compare" id="mpTable">
-          <caption>Comparativo de custo líquido do insumo/matéria-prima</caption>
+          <caption>Comparativo de custo líquido real da contratação/aquisição</caption>
           <thead>
             <tr>
-              <th>Perfil do Fornecedor de Matéria-Prima</th>
+              <th>Perfil do Fornecedor / Prestador</th>
               <th class="num">Crédito Recuperado (R$)</th>
               <th class="num">Custo Líquido Real (R$)</th>
-              <th class="num">Desconto Exigido p/ Empate</th>
+              <th class="num">Desconto Exigido p/ Igualar</th>
             </tr>
           </thead>
           <tbody id="mpBody"></tbody>
@@ -643,8 +646,8 @@
   </section>
 
   <footer>
-    <p><strong>Isto é uma estimativa educacional e estratégica, não uma orientação tributária definitiva.</strong> O simulador utiliza as tabelas da LC 123/2006, as regras de presunção do Lucro Presumido e a projeção do IVA Dual da EC 132/2023. Confirme sempre os enquadramentos fiscais específicos com seu contador.</p>
-    <p>Simulador Tributário EVP — Ferramenta estática hospedada no GitHub Pages.</p>
+    <p><strong>Ferramenta estratégica e educativa de apoio à tomada de decisão.</strong> Aplica as tabelas da LC 123/2006, presunções do Lucro Presumido/Real e a Emenda Constitucional nº 132/2023. Consulte sempre seu contador responsável para validações operacionais.</p>
+    <p>Simulador Tributário EVP — Hospedagem estática.</p>
   </footer>
 
 </div>
@@ -664,7 +667,6 @@
     return isNaN(n) ? 0 : n;
   };
 
-  // Tabelas do Simples Nacional (LC 123/2006)
   const TABLES = {
     I:   [[180000,0.040,0],[360000,0.073,5940],[720000,0.095,13860],[1800000,0.107,22500],[3600000,0.143,87300],[4800000,0.190,378000]],
     II:  [[180000,0.045,0],[360000,0.078,5940],[720000,0.100,13860],[1800000,0.112,22500],[3600000,0.147,85500],[4800000,0.300,720000]],
@@ -712,7 +714,6 @@
     const baseCSLL = faturamentoMensal * presCSLL;
 
     const irpj = baseIRPJ * 0.15;
-    // Adicional de IRPJ (10%) incide APENAS sobre a parcela da base mensal que exceder R$ 20.000,00
     const adicional = Math.max(0, baseIRPJ - 20000) * 0.10;
     const csll = baseCSLL * 0.09;
     const pis = faturamentoMensal * 0.0065;
@@ -789,7 +790,6 @@
     };
   }
 
-  // UI Controls
   const setorSel = $('setor');
   const anexoSel = $('anexo');
 
@@ -827,7 +827,6 @@
   tabBtnCredito.addEventListener('click', () => showTab('credito'));
   tabBtnMateriaPrima.addEventListener('click', () => showTab('mp'));
 
-  // Cálculo Principal
   $('calcBtn').addEventListener('click', () => {
     const setor = setorSel.value;
     let anexo = anexoSel.value;
@@ -859,7 +858,7 @@
     const reforma = calcReforma(faturamentoMensal, folhaMensal, encargosFolhaPct, rpa, creditoPctVal, ivaRateVal);
 
     const rows = [
-      { label: `Simples Nacional (Anexo ${simples.anexoUsado})${simples.acimaDoTeto ? ' ⚠ acima do teto' : (simples.acimaDoSublimite ? ' ⚠ acima do sublimite' : '')}`, total: simples.total, aliq: simples.aliqEfetiva },
+      { label: `Simples Nacional (Anexo ${simples.anexoUsado})${simples.acimaDoTeto ? ' ⚠ Excede Teto' : (simples.acimaDoSublimite ? ' ⚠ Excede Sublimite' : '')}`, total: simples.total, aliq: simples.aliqEfetiva },
       { label: 'Lucro Presumido', total: presumido.total, aliq: presumido.total / faturamentoMensal },
       { label: 'Lucro Real (RPA)', total: rpa.total, aliq: rpa.total / faturamentoMensal },
     ];
@@ -885,40 +884,38 @@
 
     let tetoWarning = '';
     if (simples.acimaDoTeto) {
-      tetoWarning = `<div class="reform-note" style="border-left-color:var(--brick); margin:0 0 22px;"><strong>Atenção:</strong> A receita bruta acumulada (${fmtBRL(rbt12)}) ultrapassa o teto do Simples Nacional (R$ 4,8 Mi). A empresa deve ser excluída do regime.</div>`;
+      tetoWarning = `<div class="reform-note" style="border-left-color:var(--brick); margin:0 0 22px;"><strong>Alerta de Exclusão:</strong> A receita acumulada (${fmtBRL(rbt12)}) supera o teto de R$ 4,8 Mi do Simples Nacional. O regime torna-se vedado.</div>`;
     } else if (simples.acimaDoSublimite) {
-      tetoWarning = `<div class="reform-note" style="border-left-color:var(--brass-dark); margin:0 0 22px;"><strong>Atenção ao Sublimite:</strong> A receita acumulada (${fmtBRL(rbt12)}) ultrapassou R$ 3,6 Mi. O ICMS/ISS deve ser recolhido "por fora" do DAS no regime normal.</div>`;
+      tetoWarning = `<div class="reform-note" style="border-left-color:var(--brass-dark); margin:0 0 22px;"><strong>Alerta de Sublimite:</strong> A receita acumulada (${fmtBRL(rbt12)}) ultrapassou R$ 3,6 Mi. ICMS/ISS devem ser apurados no regime normal.</div>`;
     }
 
     verdict.innerHTML = `
       ${tetoWarning}
-      <h3>Hoje, o ${cheaper} é a opção mais econômica</h3>
-      <p>Economia mensal estimada frente à segunda melhor opção: <span class="savings">${fmtBRL(diff)}</span> (${fmtBRL(diff*12)}/ano).</p>
-      <p>Manter o Pró-Labore alinhado ao Fator R (mínimo de 28% da receita bruta) garante o enquadramento no Anexo III, proporcionando a menor alíquota do Simples Nacional.</p>
+      <h3>Decisão Recomendada: ${cheaper}</h3>
+      <p>Economia mensal estimada sobre a segunda melhor opção: <span class="savings">${fmtBRL(diff)}</span> (${fmtBRL(diff*12)}/ano).</p>
+      <p>Manter o Pró-Labore em pelo menos 28% do faturamento garante a manutenção no Anexo III, proporcionando a menor carga tributária e distribuição de lucros isenta na PF.</p>
     `;
 
-    // Breakdowns
     $('bkSimplesBody').innerHTML = `
-      <div class="bk-row"><span>Anexo utilizado</span><span>${simples.anexoUsado}${simples.fatorR!==null ? ' (Fator R: '+fmtPct(simples.fatorR*100)+')' : ''}</span></div>
-      <div class="bk-row"><span>Alíquota nominal da faixa</span><span>${fmtPct(simples.aliqNominal*100)}</span></div>
-      <div class="bk-row"><span>Parcela a deduzir (anual)</span><span>${fmtBRL(simples.deduz)}</span></div>
+      <div class="bk-row"><span>Anexo efetivo</span><span>${simples.anexoUsado}${simples.fatorR!==null ? ' (Fator R: '+fmtPct(simples.fatorR*100)+')' : ''}</span></div>
+      <div class="bk-row"><span>Alíquota nominal</span><span>${fmtPct(simples.aliqNominal*100)}</span></div>
+      <div class="bk-row"><span>Dedução anual</span><span>${fmtBRL(simples.deduz)}</span></div>
       <div class="bk-row"><span>Alíquota efetiva apurada</span><span>${fmtPct(simples.aliqEfetiva*100)}</span></div>
-      <div class="bk-row"><span>Total mensal (DAS)</span><span>${fmtBRL(simples.total)}</span></div>
+      <div class="bk-row"><span>Imposto mensal (DAS)</span><span>${fmtBRL(simples.total)}</span></div>
     `;
 
     $('bkPresumidoBody').innerHTML = `
-      <div class="bk-row"><span>Base de presunção — IRPJ (${fmtPct(presumido.presIRPJ*100)})</span><span>${fmtBRL(faturamentoMensal * presumido.presIRPJ)}</span></div>
-      <div class="bk-row"><span>IRPJ (15% da base)</span><span>${fmtBRL(presumido.irpj)}</span></div>
-      <div class="bk-row"><span>Adicional de IRPJ (10% sobre excedente de R$ 20 mil)</span><span>${fmtBRL(presumido.adicional)}</span></div>
+      <div class="bk-row"><span>Base IRPJ (${fmtPct(presumido.presIRPJ*100)})</span><span>${fmtBRL(faturamentoMensal * presumido.presIRPJ)}</span></div>
+      <div class="bk-row"><span>IRPJ (15%) + Adicional (10% sobre excedente de 20k)</span><span>${fmtBRL(presumido.irpj + presumido.adicional)}</span></div>
       <div class="bk-row"><span>CSLL (${fmtPct(presumido.presCSLL*100)} de base / 9%)</span><span>${fmtBRL(presumido.csll)}</span></div>
       <div class="bk-row"><span>PIS (0,65%) + COFINS (3,00%)</span><span>${fmtBRL(presumido.pis + presumido.cofins)}</span></div>
-      <div class="bk-row"><span>${presumido.servico ? 'ISS' : 'ICMS'} estimado</span><span>${fmtBRL(presumido.icmsIss)}</span></div>
-      <div class="bk-row"><span>CPP sobre folha / pró-labore</span><span>${fmtBRL(presumido.cpp)}</span></div>
+      <div class="bk-row"><span>${presumido.servico ? 'ISS' : 'ICMS'} municipal/estadual</span><span>${fmtBRL(presumido.icmsIss)}</span></div>
+      <div class="bk-row"><span>CPP patronal sobre folha</span><span>${fmtBRL(presumido.cpp)}</span></div>
       <div class="bk-row"><span>Total mensal</span><span>${fmtBRL(presumido.total)}</span></div>
     `;
 
     $('bkRPABody').innerHTML = `
-      <div class="bk-row"><span>Base de lucro real (${fmtPct(rpa.margem*100)} de margem)</span><span>${fmtBRL(rpa.baseLucro)}</span></div>
+      <div class="bk-row"><span>Base Real (${fmtPct(rpa.margem*100)} de margem)</span><span>${fmtBRL(rpa.baseLucro)}</span></div>
       <div class="bk-row"><span>IRPJ (15%) + Adicional (10%)</span><span>${fmtBRL(rpa.irpj + rpa.adicional)}</span></div>
       <div class="bk-row"><span>CSLL (9%)</span><span>${fmtBRL(rpa.csll)}</span></div>
       <div class="bk-row"><span>PIS + COFINS líquidos do crédito</span><span>${fmtBRL(rpa.pis + rpa.cofins)}</span></div>
@@ -928,13 +925,12 @@
 
     $('bkReformaBody').innerHTML = `
       <div class="bk-row"><span>Débito de IBS/CBS (${ivaRateVal}%)</span><span>${fmtBRL(reforma.debito)}</span></div>
-      <div class="bk-row"><span>Crédito sobre insumos</span><span>-${fmtBRL(reforma.credito)}</span></div>
-      <div class="bk-row"><span>IBS/CBS líquido</span><span>${fmtBRL(reforma.ivaLiquido)}</span></div>
-      <div class="bk-row"><span>IRPJ + CSLL + CPP</span><span>${fmtBRL(reforma.irpj + reforma.adicional + reforma.csll + reforma.cpp)}</span></div>
+      <div class="bk-row"><span>Crédito sobre insumos/contratações</span><span>-${fmtBRL(reforma.credito)}</span></div>
+      <div class="bk-row"><span>IBS/CBS líquido a recolher</span><span>${fmtBRL(reforma.ivaLiquido)}</span></div>
+      <div class="bk-row"><span>IRPJ + CSLL + CPP patronal</span><span>${fmtBRL(reforma.irpj + reforma.adicional + reforma.csll + reforma.cpp)}</span></div>
       <div class="bk-row"><span>Total mensal projetado (2033)</span><span>${fmtBRL(reforma.total)}</span></div>
     `;
 
-    // Créditos Repassados
     const cred = calcCreditos(setor, faturamentoMensal, comprasComCredito, icmsIssPct, simples, presumido, rpa, reforma, parseFloat(pctB2B.value), parseFloat(repasseSimples.value), ivaRateVal);
     const creditBody = $('creditBody');
     creditBody.innerHTML = '';
@@ -951,22 +947,25 @@
     });
 
     $('verdictCredito').innerHTML = `
-      <h3>Repasse de Créditos Tributários na Nota Fiscal</h3>
-      <p>No ${cheaper}, seus clientes PJ aproveitam cerca de <span class="savings">${fmtBRL(cred.repassadoSimples)}</span>/mês em crédito sobre o que compram de você.</p>
-      <p>Em 2027, caso algum cliente PJ solicite $100\%$ do crédito de IVA, você poderá optar pelo recolhimento do IBS/CBS "por fora" do DAS, elevando o repasse para <span class="savings">${fmtBRL(cred.repassadoReforma)}</span> sem perder o enquadramento no Simples Nacional.</p>
+      <h3>Repasse de Crédito ao seu Cliente B2B</h3>
+      <p>No ${cheaper}, seus clientes PJ aproveitam cerca de <span class="savings">${fmtBRL(cred.repassadoSimples)}</span>/mês em créditos de imposto.</p>
+      <p>Se a partir de 2027 um cliente B2B exigir repasse de 100% do IVA, você poderá optar pelo **Simples Híbrido** (recolher IBS/CBS por fora da DAS), elevando o repasse para <span class="savings">${fmtBRL(cred.repassadoReforma)}</span> sem perder o Simples Nacional na empresa.</p>
     `;
 
     $('bkCreditoBody').innerHTML = `
-      <div class="bk-row"><span>Insumos com direito a crédito</span><span>${fmtBRL(comprasComCredito)}</span></div>
-      <div class="bk-row"><span>Parcela de vendas para clientes PJ</span><span>${pctB2B.value}%</span></div>
+      <div class="bk-row"><span>Volume de aquisições com crédito</span><span>${fmtBRL(comprasComCredito)}</span></div>
+      <div class="bk-row"><span>Proporção de vendas para clientes PJ</span><span>${pctB2B.value}%</span></div>
     `;
 
-    $('results').style.display = 'block';
+    $('cargaContentHolder').style.display = 'none';
+    $('cargaResultsDynamic').style.display = 'block';
+    $('creditoContentHolder').style.display = 'none';
+    $('creditoResultsDynamic').style.display = 'block';
+
     showTab('carga');
     $('results').scrollIntoView({ behavior:'smooth', block:'start' });
   });
 
-  // Cálculo da Aba de Matéria-Prima
   $('calcMPBtn').addEventListener('click', () => {
     const valorMP = parseNum($('valorMP').value) || 0;
     const suaEmpresaRegime = $('suaEmpresaRegime').value;
@@ -974,7 +973,7 @@
     const ivaRateVal = parseFloat(ivaRate.value) || 26.5;
 
     if (valorMP <= 0) {
-      alert('Informe o valor da compra de matéria-prima.');
+      alert('Informe o valor da compra ou contrato.');
       return;
     }
 
@@ -984,15 +983,15 @@
 
     if (suaEmpresaRegime === 'simples') {
       verdictMP.innerHTML = `
-        <h3>No Simples Nacional (100% DAS), o crédito não abate seu imposto</h3>
-        <p>Como a sua empresa recolhe o imposto unificado via DAS, você não toma crédito direto de IBS/CBS sobre a matéria-prima comprada. O custo líquido da compra é o valor de tabela: <span class="savings">${fmtBRL(valorMP)}</span>.</p>
-        <p>Nesta condição, você deve negociar o menor preço de tabela, prazos e qualidade, independentemente do regime do fornecedor.</p>
+        <h3>No Simples Nacional (100% DAS), aquisições não geram crédito direto</h3>
+        <p>Como a sua empresa recolhe via DAS unificada, o tributo das notas de compras e serviços contratados não abatem o seu imposto. O custo líquido é o valor bruto de tabela: <span class="savings">${fmtBRL(valorMP)}</span>.</p>
+        <p>Nesta condição, busque sempre o **menor preço nominal de tabela**, prazo de pagamento e qualidade, independente do regime fiscal do prestador/fornecedor.</p>
       `;
 
       [
-        { nome: 'Fornecedor A (Lucro Real / Presumido)', credito: 0, custo: valorMP, desc: 0 },
-        { nome: 'Fornecedor B (Simples Híbrido - IVA por fora)', credito: 0, custo: valorMP, desc: 0 },
-        { nome: 'Fornecedor C (Simples 100% DAS)', credito: 0, custo: valorMP, desc: 0 },
+        { nome: 'Fornecedor/Prestador A (Lucro Real / Presumido)', credito: 0, custo: valorMP, desc: 0 },
+        { nome: 'Fornecedor/Prestador B (Simples Híbrido - IVA por fora)', credito: 0, custo: valorMP, desc: 0 },
+        { nome: 'Fornecedor/Prestador C (Simples 100% DAS)', credito: 0, custo: valorMP, desc: 0 },
       ].forEach(r => {
         const tr = document.createElement('tr');
         tr.innerHTML = `<td>${r.nome}</td><td class="num">${fmtBRL(r.credito)}</td><td class="num">${fmtBRL(r.custo)}</td><td class="num">${fmtBRL(r.desc)}</td>`;
@@ -1008,15 +1007,15 @@
       const descontoExigido = custoSimplesDAS - custoRegimeNormal;
 
       verdictMP.innerHTML = `
-        <h3>Matéria-Prima: Comparativo de Caixa e Crédito de IVA</h3>
-        <p>Ao comprar R$ ${fmtBRL(valorMP)} em insumos de um fornecedor do <strong>Regime Normal ou Simples Híbrido</strong>, o seu caixa recupera <span class="savings">${fmtBRL(credCheio)}</span> em créditos de IVA (26,5%), deixando o custo líquido real em <span class="savings">${fmtBRL(custoRegimeNormal)}</span>.</p>
-        <p>Se comprar de um <strong>Fornecedor do Simples 100% DAS</strong>, você só recupera <span class="savings">${fmtBRL(credSimples)}</span> em crédito. Para o contrato valer a pena, o fornecedor do Simples precisa conceder um <strong>desconto de ${fmtBRL(descontoExigido)} (${fmtPct(descontoExigido/valorMP*100)})</strong> no preço da matéria-prima ou optar por apurar o IVA por fora do DAS.</p>
+        <h3>Análise do Custo Líquido do Contrato / Aquisição</h3>
+        <p>Ao contratar R$ ${fmtBRL(valorMP)} de um fornecedor do **Regime Normal ou Simples Híbrido**, seu caixa recupera <span class="savings">${fmtBRL(credCheio)}</span> em crédito de IVA (26,5%), deixando o custo líquido real em <span class="savings">${fmtBRL(custoRegimeNormal)}</span>.</p>
+        <p>Se contratar de um **Fornecedor do Simples 100% DAS**, você só recupera <span class="savings">${fmtBRL(credSimples)}</span> de crédito. Para compensar a perda no caixa, o fornecedor deve dar um **desconto de ${fmtBRL(descontoExigido)} (${fmtPct(descontoExigido/valorMP*100)})** no valor do contrato ou emitir o IVA por fora do DAS.</p>
       `;
 
       const rowsMP = [
-        { nome: 'Fornecedor A (Lucro Real / Presumido)', credito: credCheio, custo: custoRegimeNormal, desc: 0, best: true },
-        { nome: 'Fornecedor B (Simples Híbrido - IVA por fora)', credito: credCheio, custo: custoRegimeNormal, desc: 0, best: true },
-        { nome: 'Fornecedor C (Simples 100% DAS)', credito: credSimples, custo: custoSimplesDAS, desc: descontoExigido, best: false },
+        { nome: 'Fornecedor/Prestador A (Lucro Real / Presumido)', credito: credCheio, custo: custoRegimeNormal, desc: 0, best: true },
+        { nome: 'Fornecedor/Prestador B (Simples Híbrido - IVA por fora)', credito: credCheio, custo: custoRegimeNormal, desc: 0, best: true },
+        { nome: 'Fornecedor/Prestador C (Simples 100% DAS)', credito: credSimples, custo: custoSimplesDAS, desc: descontoExigido, best: false },
       ];
 
       rowsMP.forEach(r => {
