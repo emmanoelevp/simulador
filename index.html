@@ -40,8 +40,7 @@
     position: fixed;
     inset:0;
     pointer-events:none;
-    background-image:
-      linear-gradient(var(--rule) 1px, transparent 1px);
+    background-image: linear-gradient(var(--rule) 1px, transparent 1px);
     background-size: 100% 42px;
     opacity: .05;
     z-index: 0;
@@ -55,7 +54,7 @@
     z-index: 1;
   }
 
-  /* ---------- Header / document block ---------- */
+  /* Header */
   header.doc{
     border-bottom: 2px solid var(--ink);
     padding: 40px 0 22px;
@@ -100,7 +99,7 @@
   }
   .doc-meta strong{ color: var(--ink); font-weight: 500; }
 
-  /* ---------- Section framing (form as ledger) ---------- */
+  /* Sections */
   section.sheet{
     border-top: 1px solid var(--rule-strong);
     padding-top: 28px;
@@ -133,7 +132,7 @@
     max-width: 56ch;
   }
 
-  /* ---------- Fields ---------- */
+  /* Form Grid */
   .grid{
     display:grid;
     grid-template-columns: 1fr 1fr;
@@ -205,13 +204,14 @@
   button.calc:hover{ background: var(--brass-dark); }
   .btn-caption{ font-size: 13px; color: var(--ink-soft); }
 
-  /* ---------- Results ---------- */
+  /* Results and Tabs */
   #results{ display:none; }
 
   .tabs{
     display:flex;
     gap: 4px;
     margin-bottom: -1px;
+    flex-wrap: wrap;
   }
   .tab-btn{
     font-family: var(--sans);
@@ -247,7 +247,7 @@
     background: var(--paper-raised);
   }
   .verdict::before{
-    content: "PARECER";
+    content: "PARECER ESTRATÉGICO";
     position:absolute;
     top:-11px; left: 22px;
     background: var(--paper-raised);
@@ -297,12 +297,11 @@
     border-bottom: 2px solid var(--ink);
     color: var(--ink-soft);
     font-size: 12.5px;
-    text-transform: none;
   }
   table.compare td.num, table.compare th.num{ font-family: var(--mono); }
   table.compare tr.best td{ font-weight: 600; color: var(--forest); }
   table.compare tr.best td:first-child::after{
-    content: " ◆ menor carga hoje";
+    content: " ◆ melhor opção";
     font-family: var(--sans);
     font-weight: 400;
     font-size: 11.5px;
@@ -370,7 +369,7 @@
       <span id="today"></span>
     </div>
     <h1 class="title">Simulador<br>Tributário <em>EVP</em></h1>
-    <p class="subtitle">Compare, hoje, o quanto sua empresa paga no Simples Nacional e no Lucro Presumido — e o que muda quando a CBS e o IBS entrarem em regime pleno.</p>
+    <p class="subtitle">Análise tributária completa: compare o Simples Nacional, Lucro Presumido e Lucro Real, com impacto da Reforma Tributária (IBS/CBS) e simulação de fornecedores de matéria-prima.</p>
     <div class="doc-meta">
       <span>Base legal: <strong>EC 132/2023 · LC 214/2025</strong></span>
       <span>Transição: <strong>2026 – 2033</strong></span>
@@ -383,56 +382,58 @@
       <span class="sheet-num">01</span>
       <h2>A empresa</h2>
     </div>
-    <p class="sheet-note">Use números aproximados dos últimos 12 meses — dá para refazer a simulação quantas vezes quiser.</p>
+    <p class="sheet-note">Informe os valores mensais ou acumulados. Se você é único sócio e não tem funcionários CLT, informe seu Pró-Labore bruto no campo da folha para considerar o Fator R do Anexo III.</p>
 
     <div class="grid">
       <div class="field">
         <label for="setor">Atividade principal
-          <span class="hint">Define a presunção de lucro e o anexo sugerido</span>
+          <span class="hint">Define a presunção de lucro e o anexo do Simples</span>
         </label>
         <select id="setor">
+          <option value="servicos_geral">Serviços em geral / Apoio Administrativo</option>
+          <option value="servicos_intelectuais">Serviços intelectuais / Regulamentados</option>
           <option value="comercio">Comércio</option>
           <option value="industria">Indústria</option>
-          <option value="servicos_geral">Serviços em geral</option>
-          <option value="servicos_intelectuais">Serviços intelectuais / regulamentados</option>
         </select>
       </div>
 
       <div class="field">
         <label for="anexo">Anexo do Simples Nacional
-          <span class="hint">Ajustado automaticamente; você pode corrigir</span>
+          <span class="hint">Ajustado automaticamente via Fator R (III / V)</span>
         </label>
         <select id="anexo">
+          <option value="III">Anexo III — Serviços (Alíquota inicial 6%)</option>
+          <option value="V">Anexo V — Serviços (Sem folha / Fator R &lt; 28%)</option>
           <option value="I">Anexo I — Comércio</option>
           <option value="II">Anexo II — Indústria</option>
-          <option value="III">Anexo III — Serviços</option>
           <option value="IV">Anexo IV — Serviços (sem CPP na alíquota)</option>
-          <option value="V">Anexo V — Serviços (Fator R &lt; 28%)</option>
         </select>
       </div>
 
       <div class="field">
         <label for="faturamentoMensal">Faturamento bruto mensal médio (R$)</label>
-        <input type="text" inputmode="numeric" id="faturamentoMensal" placeholder="Ex.: 45000" value="45000">
+        <input type="text" inputmode="numeric" id="faturamentoMensal" placeholder="Ex.: 4204" value="4204">
       </div>
 
       <div class="field">
         <label for="rbt12">Receita bruta — últimos 12 meses (R$)
-          <span class="hint">Deixe em branco para usar 12× o valor mensal</span>
+          <span class="hint">Deixe em branco para calcular 12× o valor mensal</span>
         </label>
-        <input type="text" inputmode="numeric" id="rbt12" placeholder="Ex.: 540000">
+        <input type="text" inputmode="numeric" id="rbt12" placeholder="Ex.: 50448">
       </div>
 
       <div class="field">
-        <label for="folhaMensal">Folha de pagamento mensal — salários + encargos do trabalhador (R$)</label>
-        <input type="text" inputmode="numeric" id="folhaMensal" placeholder="Ex.: 8000" value="8000">
+        <label for="folhaMensal">Folha de pagamento / Pró-Labore mensal bruto (R$)
+          <span class="hint">Informe o Pró-Labore (min. 28% da receita) para garantir o Anexo III</span>
+        </label>
+        <input type="text" inputmode="numeric" id="folhaMensal" placeholder="Ex.: 1178" value="1178">
       </div>
 
       <div class="field">
-        <label for="folha12">Folha de pagamento acumulada — 12 meses (R$)
-          <span class="hint">Usada no Fator R para os Anexos III/V</span>
+        <label for="folha12">Folha / Pró-Labore acumulado — 12 meses (R$)
+          <span class="hint">Deixe em branco para usar 12× a folha mensal</span>
         </label>
-        <input type="text" inputmode="numeric" id="folha12" placeholder="Deixe em branco para usar 12× a folha mensal">
+        <input type="text" inputmode="numeric" id="folha12" placeholder="Ex.: 14136">
       </div>
     </div>
   </section>
@@ -440,28 +441,28 @@
   <section class="sheet" id="assumptions-section">
     <div class="sheet-head">
       <span class="sheet-num">02</span>
-      <h2>Premissas do Lucro Presumido e da reforma</h2>
+      <h2>Premissas do Lucro Presumido e da Reforma Tributária</h2>
     </div>
-    <p class="sheet-note">Ajuste se souber os números reais da sua empresa; os valores sugeridos são pontos de partida razoáveis.</p>
+    <p class="sheet-note">Ajuste as premissas estaduais/municipais e as projeções do IVA Dual (IBS + CBS) para 2033.</p>
 
     <div class="grid">
       <div class="field">
         <label for="icmsIss">Alíquota de ICMS ou ISS aplicável (%)
-          <span class="hint">ICMS interno do estado, ou ISS do município</span>
+          <span class="hint">ISS do município (ex.: SP ~ 2% a 5%) ou ICMS estadual</span>
         </label>
-        <input type="text" inputmode="decimal" id="icmsIss" value="5">
+        <input type="text" inputmode="decimal" id="icmsIss" value="2">
       </div>
 
       <div class="field">
-        <label for="encargosFolha">Encargos patronais sobre a folha (%)
-          <span class="hint">INSS patronal + RAT + terceiros, aprox. 28%</span>
+        <label for="encargosFolha">Encargos patronais sobre a folha no Presumido (%)
+          <span class="hint">INSS patronal + RAT + Terceiros (aprox. 28%)</span>
         </label>
         <input type="text" inputmode="decimal" id="encargosFolha" value="28">
       </div>
 
       <div class="field span2">
-        <label for="creditoPct">Parcela da receita com direito a crédito de tributos sobre insumos (%)
-          <span class="hint">Compras de mercadoria, matéria-prima ou serviços tomados de fornecedores do regime normal</span>
+        <label for="creditoPct">Parcela das compras/insumos com direito a crédito (%)
+          <span class="hint">Compras de insumos, matérias-primas ou serviços de fornecedores do regime normal</span>
         </label>
         <div class="range-row">
           <input type="range" id="creditoPct" min="0" max="80" value="40">
@@ -471,14 +472,14 @@
 
       <div class="field">
         <label for="margemReal">Margem de lucro real estimada (%)
-          <span class="hint">Necessária só para o Lucro Real (RPA) — ele tributa o lucro de fato, não por presunção</span>
+          <span class="hint">Necessária para apuração no Lucro Real (RPA)</span>
         </label>
         <input type="text" inputmode="decimal" id="margemReal" value="15">
       </div>
 
       <div class="field span2">
-        <label for="ivaRate">Alíquota de referência do IVA dual (CBS + IBS) em regime pleno (%)
-          <span class="hint">Estimativa de mercado para 2033; ajuste conforme estudos mais recentes</span>
+        <label for="ivaRate">Alíquota de referência do IVA Dual (CBS + IBS) em regime pleno (%)
+          <span class="hint">Estimativa do IVA neutro para 2033</span>
         </label>
         <div class="range-row">
           <input type="range" id="ivaRate" min="20" max="30" step="0.1" value="26.5">
@@ -487,8 +488,8 @@
       </div>
 
       <div class="field span2">
-        <label for="pctB2B">Parcela das suas vendas ou prestações para clientes PJ do regime normal (%)
-          <span class="hint">Esses clientes conseguem aproveitar crédito sobre o que você vende a eles</span>
+        <label for="pctB2B">Parcela das suas vendas/prestações para clientes PJ (%)
+          <span class="hint">Clientes do regime normal que se apropriam do crédito da sua nota</span>
         </label>
         <div class="range-row">
           <input type="range" id="pctB2B" min="0" max="100" value="40">
@@ -497,8 +498,8 @@
       </div>
 
       <div class="field span2">
-        <label for="repasseSimples">Hoje, quanto do seu imposto o cliente PJ consegue aproveitar como crédito (%)
-          <span class="hint">No Simples isso costuma ser baixo ou zero, pois o DAS não destaca ICMS/PIS/COFINS separadamente</span>
+        <label for="repasseSimples">Quanto da sua alíquota do DAS o cliente PJ aproveita como crédito (%)
+          <span class="hint">Estimativa do repasse proporcional de IBS/CBS dentro do DAS do Simples</span>
         </label>
         <div class="range-row">
           <input type="range" id="repasseSimples" min="0" max="100" value="15">
@@ -509,7 +510,7 @@
 
     <div class="btn-row">
       <button class="calc" id="calcBtn">Calcular simulação</button>
-      <span class="btn-caption">Nada é enviado a servidor algum — o cálculo roda só no seu navegador.</span>
+      <span class="btn-caption">Nada é enviado a servidor algum — o cálculo roda 100% no seu navegador.</span>
     </div>
   </section>
 
@@ -521,10 +522,11 @@
 
     <div class="tabs" role="tablist">
       <button class="tab-btn active" id="tabBtnCarga" role="tab" aria-selected="true">Carga tributária</button>
-      <button class="tab-btn" id="tabBtnCredito" role="tab" aria-selected="false">Créditos tomados e repassados</button>
-      <button class="tab-btn" id="tabBtnComprador" role="tab" aria-selected="false">Visão de quem contrata</button>
+      <button class="tab-btn" id="tabBtnCredito" role="tab" aria-selected="false">Créditos repassados ao cliente</button>
+      <button class="tab-btn" id="tabBtnMateriaPrima" role="tab" aria-selected="false">Análise de Fornecedores / Matéria-Prima</button>
     </div>
 
+    <!-- Painel 1: Carga Tributária -->
     <div class="tab-panel" id="panelCarga">
       <div class="verdict" id="verdict" aria-live="polite"></div>
 
@@ -532,9 +534,9 @@
         <caption>Carga tributária mensal estimada, por regime</caption>
         <thead>
           <tr>
-            <th>Regime</th>
-            <th class="num">Carga mensal</th>
-            <th class="num">Alíquota efetiva</th>
+            <th>Regime Tributário</th>
+            <th class="num">Carga Mensal (R$)</th>
+            <th class="num">Alíquota Efetiva (%)</th>
           </tr>
         </thead>
         <tbody id="compareBody"></tbody>
@@ -546,7 +548,7 @@
       </details>
 
       <details class="breakdown" id="bkPresumido">
-        <summary>Ver como o Lucro Presumido foi calculated</summary>
+        <summary>Ver como o Lucro Presumido foi calculado</summary>
         <div id="bkPresumidoBody"></div>
       </details>
 
@@ -560,19 +562,20 @@
         <div id="bkReformaBody"></div>
       </details>
 
-      <p class="reform-note">A transição vale para todos até 2033. Empresas do Simples decidem em setembro/2026 se querem migrar para 2027, e — a partir de 2027 — podem apurar o IBS/CBS "por fora" do DAS se isso gerar mais crédito para seus clientes. Essa decisão depende de quem são seus clientes (pessoa física ou jurídica) e é justamente o que a aba de créditos ao lado tenta medir.</p>
+      <p class="reform-note">A transição vale para todos até 2033. Empresas do Simples decidem em setembro/2026 se querem migrar para 2027, e — a partir de 2027 — podem apurar o IBS/CBS "por fora" do DAS para repassar 100% de crédito aos clientes sem sair do Simples Nacional.</p>
     </div>
 
+    <!-- Painel 2: Créditos Repassados -->
     <div class="tab-panel" id="panelCredito" hidden>
       <div class="verdict" id="verdictCredito" aria-live="polite"></div>
 
       <table class="compare" id="creditTable">
-        <caption>Crédito tributário mensal, por regime</caption>
+        <caption>Crédito tributário mensal gerado nas suas vendas, por regime</caption>
         <thead>
           <tr>
             <th>Regime</th>
             <th class="num">Crédito tomado nas compras</th>
-            <th class="num">Crédito repassado ao cliente PJ</th>
+            <th class="num">Crédito repassado ao seu cliente PJ</th>
           </tr>
         </thead>
         <tbody id="creditBody"></tbody>
@@ -583,100 +586,65 @@
         <div id="bkCreditoBody"></div>
       </details>
 
-      <p class="reform-note">"Crédito tomado" é o quanto sua empresa consegue abater de imposto ao comprar insumos ou mercadorias. "Crédito repassado" é o quanto do imposto embutido na sua nota o seu cliente PJ do regime normal consegue usar para abater o imposto dele — quanto maior esse número, mais competitiva fica sua nota fiscal para quem compra de você.</p>
+      <p class="reform-note">"Crédito repassado" é o valor que o seu cliente PJ do regime normal utiliza para abater do imposto dele ao comprar de você. Quanto maior esse crédito, mais atrativa fica a sua nota fiscal comercialmente.</p>
     </div>
 
-    <div class="tab-panel" id="panelComprador" hidden>
-      <p class="sheet-note" style="margin:0 0 20px;">Aqui a pergunta muda de lado: se <strong>você</strong> compra um produto ou contrata um serviço, o regime do seu fornecedor muda o quanto sobra pra você em crédito — e isso pode compensar um preço maior ou menor.</p>
+    <!-- Painel 3: Matéria-Prima e Fornecedores -->
+    <div class="tab-panel" id="panelMateriaPrima" hidden>
+      <p class="sheet-note" style="margin:0 0 20px;">Use esta aba para calcular o **custo líquido real de comprar matéria-prima/insumos** de diferentes fornecedores. O simulador calcula quanto de crédito tributário retorna para o seu caixa e qual desconto um fornecedor do Simples precisa dar para compensar a perda de crédito.</p>
 
       <div class="grid">
         <div class="field span2">
-          <label for="valorContratado">Valor mensal do que você compra ou contrata (R$)
-            <span class="hint">Considere o mesmo valor para os três fornecedores, para comparar só o efeito do crédito</span>
+          <label for="valorMP">Valor de tabela da compra de matéria-prima / insumos (R$)
+            <span class="hint">Considere o mesmo valor bruto para comparar a recuperação de crédito</span>
           </label>
-          <input type="text" inputmode="numeric" id="valorContratado" value="20000">
+          <input type="text" inputmode="numeric" id="valorMP" value="50000">
         </div>
 
         <div class="field">
-          <label for="tipoOperacao">Tipo de operação
-            <span class="hint">Produto gera ICMS; serviço em geral gera ISS</span>
+          <label for="suaEmpresaRegime">Sua empresa opera em qual regime?
+            <span class="hint">Define se o crédito de IVA abata o seu imposto</span>
           </label>
-          <select id="tipoOperacao">
-            <option value="produto">Compra de produto/mercadoria</option>
-            <option value="servico">Contratação de serviço</option>
+          <select id="suaEmpresaRegime">
+            <option value="normal">Regime Normal (Lucro Real / Presumido / IVA Pleno)</option>
+            <option value="simples">Simples Nacional (100% DAS)</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="icmsCompra">Alíquota de ICMS da operação (%)
-            <span class="hint">Depende da tabela do seu estado/NCM — só é usada se for produto</span>
+          <label for="repasseMPFornecedor">Se o fornecedor for do Simples 100% DAS, quanto de IVA ele repassa no DAS? (%)
+            <span class="hint">Estimativa do crédito parcial repassado (padrão: ~3%)</span>
           </label>
-          <input type="text" inputmode="decimal" id="icmsCompra" value="18">
-        </div>
-
-        <div class="field">
-          <label for="aproveitaCredito">Você aproveita crédito tributário?
-            <span class="hint">Só faz diferença se você for contribuinte do regime normal</span>
-          </label>
-          <select id="aproveitaCredito">
-            <option value="sim">Sim, sou do regime normal</option>
-            <option value="nao">Não (Simples, ou consumidor final)</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="momentoCompra">Momento da simulação</label>
-          <select id="momentoCompra">
-            <option value="hoje">Hoje (regras atuais)</option>
-            <option value="reforma">Reforma em regime pleno (2033)</option>
-          </select>
-        </div>
-
-        <div class="field" id="hibridoField" style="display:none;">
-          <label for="fornecedorHibrido">Se o fornecedor for do Simples
-            <span class="hint">A partir de 2027 ele pode optar por apurar o IBS/CBS por fora do DAS</span>
-          </label>
-          <select id="fornecedorHibrido">
-            <option value="nao">Continua tudo dentro do DAS</option>
-            <option value="sim">Apura o IBS/CBS por fora (híbrido)</option>
-          </select>
-        </div>
-
-        <div class="field span2" id="repasseHibridoField" style="display:none;">
-          <label for="repasseHibridoNao">Se o fornecedor do Simples continuar 100% no DAS, quanto do IVA pleno ele ainda repassa como crédito (%)
-            <span class="hint">Estimativa própria, ajustável — a regulamentação definitiva da apropriação de crédito no Simples ainda não está fechada</span>
-          </label>
-          <div class="range-row">
-            <input type="range" id="repasseHibridoNao" min="0" max="100" value="60">
-            <output id="repasseHibridoNaoOut">60%</output>
-          </div>
+          <input type="text" inputmode="decimal" id="repasseMPFornecedor" value="3.0">
         </div>
       </div>
 
       <div class="btn-row">
-        <button class="calc" id="calcCompradorBtn">Simular contratação</button>
+        <button class="calc" id="calcMPBtn">Simular custo líquido do fornecedor</button>
       </div>
 
-      <div id="compradorResults" style="display:none; margin-top:28px;">
-        <div class="verdict" id="verdictComprador" aria-live="polite"></div>
-        <table class="compare" id="compradorTable">
-          <caption>Custo líquido estimado, por regime do fornecedor</caption>
+      <div id="mpResults" style="display:none; margin-top:28px;">
+        <div class="verdict" id="verdictMP" aria-live="polite"></div>
+
+        <table class="compare" id="mpTable">
+          <caption>Comparativo de custo líquido do insumo/matéria-prima</caption>
           <thead>
             <tr>
-              <th>Fornecedor</th>
-              <th class="num">Crédito recuperável</th>
-              <th class="num">Custo líquido</th>
+              <th>Perfil do Fornecedor de Matéria-Prima</th>
+              <th class="num">Crédito Recuperado (R$)</th>
+              <th class="num">Custo Líquido Real (R$)</th>
+              <th class="num">Desconto Exigido p/ Empate</th>
             </tr>
           </thead>
-          <tbody id="compradorBody"></tbody>
+          <tbody id="mpBody"></tbody>
         </table>
       </div>
     </div>
   </section>
 
   <footer>
-    <p><strong>Isto é uma estimativa educacional, não uma orientação tributária definitiva.</strong> O simulador usa as tabelas vigentes do Simples Nacional e um modelo simplificado do Lucro Presumido; a integração final do IBS/CBS ao Simples Nacional ainda está sendo regulamentada e pode mudar até 2033. Antes de trocar de regime, confirme os números com um contador — a decisão também envolve prazos, obrigações acessórias e o perfil dos seus clientes.</p>
-    <p>Simulador Tributário EVP — ferramenta estática, sem coleta de dados, hospedada no GitHub Pages.</p>
+    <p><strong>Isto é uma estimativa educacional e estratégica, não uma orientação tributária definitiva.</strong> O simulador utiliza as tabelas da LC 123/2006, as regras de presunção do Lucro Presumido e a projeção do IVA Dual da EC 132/2023. Confirme sempre os enquadramentos fiscais específicos com seu contador.</p>
+    <p>Simulador Tributário EVP — Ferramenta estática hospedada no GitHub Pages.</p>
   </footer>
 
 </div>
@@ -687,7 +655,7 @@
 
   $('today').textContent = new Date().toLocaleDateString('pt-BR', { year:'numeric', month:'long', day:'numeric' });
 
-  const fmtBRL = (v) => v.toLocaleString('pt-BR', { style:'currency', currency:'BRL', maximumFractionDigits:0 });
+  const fmtBRL = (v) => v.toLocaleString('pt-BR', { style:'currency', currency:'BRL', maximumFractionDigits:2 });
   const fmtPct = (v) => v.toLocaleString('pt-BR', { minimumFractionDigits:1, maximumFractionDigits:2 }) + '%';
   const parseNum = (str) => {
     if (!str) return 0;
@@ -696,7 +664,7 @@
     return isNaN(n) ? 0 : n;
   };
 
-  // ---------- Simples Nacional tables (LC 123/2006, faixas vigentes) ----------
+  // Tabelas do Simples Nacional (LC 123/2006)
   const TABLES = {
     I:   [[180000,0.040,0],[360000,0.073,5940],[720000,0.095,13860],[1800000,0.107,22500],[3600000,0.143,87300],[4800000,0.190,378000]],
     II:  [[180000,0.045,0],[360000,0.078,5940],[720000,0.100,13860],[1800000,0.112,22500],[3600000,0.147,85500],[4800000,0.300,720000]],
@@ -735,7 +703,6 @@
     };
   }
 
-  // ---------- Lucro Presumido ----------
   function calcPresumido(setor, faturamentoMensal, folhaMensal, icmsIssPct, encargosFolhaPct){
     const servico = (setor === 'servicos_geral' || setor === 'servicos_intelectuais');
     const presIRPJ = servico ? 0.32 : 0.08;
@@ -745,7 +712,7 @@
     const baseCSLL = faturamentoMensal * presCSLL;
 
     const irpj = baseIRPJ * 0.15;
-    // CORREÇÃO: O adicional de 10% incide sobre a BASE PRESUMIDA MENSAL que exceder R$ 20.000,00
+    // Adicional de IRPJ (10%) incide APENAS sobre a parcela da base mensal que exceder R$ 20.000,00
     const adicional = Math.max(0, baseIRPJ - 20000) * 0.10;
     const csll = baseCSLL * 0.09;
     const pis = faturamentoMensal * 0.0065;
@@ -757,18 +724,15 @@
     return { presIRPJ, presCSLL, irpj, adicional, csll, pis, cofins, icmsIss, cpp, total, servico };
   }
 
-  // ---------- Lucro Real (RPA) ----------
   function calcRPA(setor, faturamentoMensal, folhaMensal, encargosFolhaPct, icmsIssPct, margemRealPct, comprasComCredito){
     const servico = (setor === 'servicos_geral' || setor === 'servicos_intelectuais');
     const margem = margemRealPct / 100;
 
     const baseLucro = faturamentoMensal * margem;
     const irpj = baseLucro * 0.15;
-    // CORREÇÃO: O adicional de 10% incide sobre a BASE REAL MENSAL que exceder R$ 20.000,00
     const adicional = Math.max(0, baseLucro - 20000) * 0.10;
     const csll = baseLucro * 0.09;
 
-    // PIS/COFINS não cumulativos: débito sobre a receita, crédito sobre as compras
     const pisDebito = faturamentoMensal * 0.0165;
     const pisCredito = comprasComCredito * 0.0165;
     const pis = Math.max(0, pisDebito - pisCredito);
@@ -777,7 +741,6 @@
     const cofinsCredito = comprasComCredito * 0.076;
     const cofins = Math.max(0, cofinsDebito - cofinsCredito);
 
-    // ICMS (produto) não cumulativo, pela alíquota informada — ISS (serviço) segue cumulativo, sem crédito
     let icmsIss = 0, icmsDebito = 0, icmsCredito = 0;
     if (servico){
       icmsIss = faturamentoMensal * (icmsIssPct / 100);
@@ -793,7 +756,6 @@
     return { servico, margem, baseLucro, irpj, adicional, csll, pis, cofins, icmsIss, icmsCredito, pisCredito, cofinsCredito, cpp, total };
   }
 
-  // ---------- Projeção — IVA pleno (CBS+IBS, cenário 2033) ----------
   function calcReforma(faturamentoMensal, folhaMensal, encargosFolhaPct, rpa, creditoPct, ivaRatePct){
     const ivaRate = ivaRatePct / 100;
     const debito = faturamentoMensal * ivaRate;
@@ -804,18 +766,15 @@
     return { debito, credito, ivaLiquido, cpp, irpj: rpa.irpj, adicional: rpa.adicional, csll: rpa.csll, total };
   }
 
-  // ---------- Créditos tomados e repassados ----------
   function calcCreditos(setor, faturamentoMensal, comprasComCredito, icmsIssPct, simples, presumido, rpa, reforma, pctB2BVal, repasseSimplesPct, ivaRateVal){
     const servico = (setor === 'servicos_geral' || setor === 'servicos_intelectuais');
     const b2b = pctB2BVal / 100;
 
-    // Crédito tomado nas compras (o que a própria empresa abate)
     const tomadoSimples = 0;
     const tomadoPresumido = servico ? 0 : comprasComCredito * (icmsIssPct / 100);
     const tomadoRPA = rpa.pisCredito + rpa.cofinsCredito + (servico ? 0 : rpa.icmsCredito);
     const tomadoReforma = reforma.credito;
 
-    // Crédito repassado ao cliente PJ do regime normal
     const repassadoSimples = simples.total * (repasseSimplesPct / 100) * b2b;
     const repassadoPresumido = (servico ? 0 : presumido.icmsIss) * b2b;
     const debitoRPA = faturamentoMensal * (0.0165 + 0.076) + (servico ? 0 : faturamentoMensal * (icmsIssPct / 100));
@@ -830,32 +789,7 @@
     };
   }
 
-  // ---------- Simulação do comprador/contratante ----------
-  function calcComprador(valor, tipoOperacao, icmsCompraPct, momento, fornecedorHibrido, repasseSimplesPct, ivaRateVal, repasseHibridoNaoPct){
-    const produto = tipoOperacao === 'produto';
-    let creditoSimples, creditoPresumido, creditoRPA;
-
-    if (momento === 'hoje'){
-      creditoSimples = valor * (repasseSimplesPct / 100);
-      creditoPresumido = produto ? valor * (icmsCompraPct / 100) : 0;
-      creditoRPA = produto
-        ? valor * ((icmsCompraPct / 100) + 0.0165 + 0.076)
-        : valor * (0.0165 + 0.076);
-    } else {
-      const ivaLiquidoRate = ivaRateVal / 100;
-      creditoRPA = valor * ivaLiquidoRate;
-      creditoPresumido = valor * ivaLiquidoRate;
-      creditoSimples = fornecedorHibrido ? valor * ivaLiquidoRate : valor * ivaLiquidoRate * (repasseHibridoNaoPct / 100);
-    }
-
-    return {
-      simples: { credito: creditoSimples, custoLiquido: valor - creditoSimples },
-      presumido: { credito: creditoPresumido, custoLiquido: valor - creditoPresumido },
-      rpa: { credito: creditoRPA, custoLiquido: valor - creditoRPA },
-    };
-  }
-
-  // ---------- UI wiring ----------
+  // UI Controls
   const setorSel = $('setor');
   const anexoSel = $('anexo');
 
@@ -864,7 +798,6 @@
     anexoSel.value = map[setorSel.value] || 'III';
   }
   setorSel.addEventListener('change', suggestAnexo);
-  suggestAnexo();
 
   const creditoPct = $('creditoPct'), creditoPctOut = $('creditoPctOut');
   creditoPct.addEventListener('input', () => creditoPctOut.textContent = creditoPct.value + '%');
@@ -876,33 +809,25 @@
   const repasseSimples = $('repasseSimples'), repasseSimplesOut = $('repasseSimplesOut');
   repasseSimples.addEventListener('input', () => repasseSimplesOut.textContent = repasseSimples.value + '%');
 
-  const tabBtnCarga = $('tabBtnCarga'), tabBtnCredito = $('tabBtnCredito'), tabBtnComprador = $('tabBtnComprador');
-  const panelCarga = $('panelCarga'), panelCredito = $('panelCredito'), panelComprador = $('panelComprador');
+  const tabBtnCarga = $('tabBtnCarga'), tabBtnCredito = $('tabBtnCredito'), tabBtnMateriaPrima = $('tabBtnMateriaPrima');
+  const panelCarga = $('panelCarga'), panelCredito = $('panelCredito'), panelMateriaPrima = $('panelMateriaPrima');
+
   function showTab(which){
     panelCarga.hidden = which !== 'carga';
     panelCredito.hidden = which !== 'credito';
-    panelComprador.hidden = which !== 'comprador';
+    panelMateriaPrima.hidden = which !== 'mp';
     tabBtnCarga.classList.toggle('active', which === 'carga');
     tabBtnCredito.classList.toggle('active', which === 'credito');
-    tabBtnComprador.classList.toggle('active', which === 'comprador');
+    tabBtnMateriaPrima.classList.toggle('active', which === 'mp');
     tabBtnCarga.setAttribute('aria-selected', which === 'carga');
     tabBtnCredito.setAttribute('aria-selected', which === 'credito');
-    tabBtnComprador.setAttribute('aria-selected', which === 'comprador');
+    tabBtnMateriaPrima.setAttribute('aria-selected', which === 'mp');
   }
   tabBtnCarga.addEventListener('click', () => showTab('carga'));
   tabBtnCredito.addEventListener('click', () => showTab('credito'));
-  tabBtnComprador.addEventListener('click', () => showTab('comprador'));
+  tabBtnMateriaPrima.addEventListener('click', () => showTab('mp'));
 
-  const momentoCompra = $('momentoCompra'), hibridoField = $('hibridoField'), repasseHibridoField = $('repasseHibridoField');
-  momentoCompra.addEventListener('change', () => {
-    const isReforma = momentoCompra.value === 'reforma';
-    hibridoField.style.display = isReforma ? 'flex' : 'none';
-    repasseHibridoField.style.display = isReforma ? 'flex' : 'none';
-  });
-
-  const repasseHibridoNao = $('repasseHibridoNao'), repasseHibridoNaoOut = $('repasseHibridoNaoOut');
-  repasseHibridoNao.addEventListener('input', () => repasseHibridoNaoOut.textContent = repasseHibridoNao.value + '%');
-
+  // Cálculo Principal
   $('calcBtn').addEventListener('click', () => {
     const setor = setorSel.value;
     let anexo = anexoSel.value;
@@ -924,7 +849,6 @@
     }
 
     const simples = calcSimples(anexo, setor, rbt12, faturamentoMensal, folha12);
-    // CORREÇÃO: Sincroniza o dropdown visual se houver alteração pelo Fator R
     if (simples.anexoUsado !== anexo) {
       anexoSel.value = simples.anexoUsado;
     }
@@ -934,7 +858,6 @@
     const rpa = calcRPA(setor, faturamentoMensal, folhaMensal, encargosFolhaPct, icmsIssPct, margemRealPct, comprasComCredito);
     const reforma = calcReforma(faturamentoMensal, folhaMensal, encargosFolhaPct, rpa, creditoPctVal, ivaRateVal);
 
-    // Comparação hoje
     const rows = [
       { label: `Simples Nacional (Anexo ${simples.anexoUsado})${simples.acimaDoTeto ? ' ⚠ acima do teto' : (simples.acimaDoSublimite ? ' ⚠ acima do sublimite' : '')}`, total: simples.total, aliq: simples.aliqEfetiva },
       { label: 'Lucro Presumido', total: presumido.total, aliq: presumido.total / faturamentoMensal },
@@ -955,39 +878,23 @@
     trReforma.innerHTML = `<td>Lucro Real (RPA) com IVA pleno — projeção 2033</td><td class="num">${fmtBRL(reforma.total)}</td><td class="num">${fmtPct(reforma.total/faturamentoMensal*100)}</td>`;
     tbody.appendChild(trReforma);
 
-    // Verdict
     const second = rows.map((r,i)=>i).filter(i=>i!==best).reduce((a,b)=> rows[a].total<rows[b].total?a:b);
     const diff = Math.abs(rows[best].total - rows[second].total);
     const cheaper = rows[best].label;
     const verdict = $('verdict');
-    let reformNote;
-    if (reforma.total < rows[best].total){
-      reformNote = `Na projeção de IVA pleno (2033), com os créditos informados, a carga cai para <span class="savings">${fmtBRL(reforma.total)}</span> — vale reavaliar o regime à medida que a reforma avança, principalmente se boa parte dos seus custos gerar crédito.`;
-    } else {
-      reformNote = `Na projeção de IVA pleno (2033), a carga estimada sobe para <span class="savings negative">${fmtBRL(reforma.total)}</span> em relação à melhor opção de hoje — o efeito tende a ser menor se você conseguir aproveitar mais créditos sobre seus insumos.`;
-    }
 
     let tetoWarning = '';
     if (simples.acimaDoTeto) {
-      tetoWarning = `
-        <div class="reform-note" style="border-left-color:var(--brick); margin:0 0 22px;">
-          <strong>Atenção:</strong> a receita bruta acumulada (${fmtBRL(rbt12)}) ultrapassa o teto do Simples Nacional (R$ 4.800.000). A empresa deve ser excluída do regime. O valor exibido é apenas referência.
-        </div>
-      `;
+      tetoWarning = `<div class="reform-note" style="border-left-color:var(--brick); margin:0 0 22px;"><strong>Atenção:</strong> A receita bruta acumulada (${fmtBRL(rbt12)}) ultrapassa o teto do Simples Nacional (R$ 4,8 Mi). A empresa deve ser excluída do regime.</div>`;
     } else if (simples.acimaDoSublimite) {
-      tetoWarning = `
-        <div class="reform-note" style="border-left-color:var(--brass-dark); margin:0 0 22px;">
-          <strong>Atenção ao Sublimite:</strong> a receita acumulada (${fmtBRL(rbt12)}) ultrapassou o sublimite de R$ 3.600.000. O ICMS e/ou ISS devem ser recolhidos "por fora" do DAS, segundo as regras do regime normal.
-        </div>
-      `;
+      tetoWarning = `<div class="reform-note" style="border-left-color:var(--brass-dark); margin:0 0 22px;"><strong>Atenção ao Sublimite:</strong> A receita acumulada (${fmtBRL(rbt12)}) ultrapassou R$ 3,6 Mi. O ICMS/ISS deve ser recolhido "por fora" do DAS no regime normal.</div>`;
     }
 
     verdict.innerHTML = `
       ${tetoWarning}
-      <h3>Hoje, ${cheaper} sai mais barato para esta empresa</h3>
-      <p>Diferença mensal estimada para a segunda opção mais barata: <span class="savings">${fmtBRL(diff)}</span> (${fmtBRL(diff*12)} ao ano).</p>
-      <p>${reformNote}</p>
-      <p>O Simples Nacional segue protegido pela EC 132/2023 durante toda a transição; a diferença real a partir de 2027 depende de você optar por apurar o IBS/CBS dentro ou "por fora" do DAS — isso vale mais a pena quando seus clientes são empresas que aproveitam o crédito.</p>
+      <h3>Hoje, o ${cheaper} é a opção mais econômica</h3>
+      <p>Economia mensal estimada frente à segunda melhor opção: <span class="savings">${fmtBRL(diff)}</span> (${fmtBRL(diff*12)}/ano).</p>
+      <p>Manter o Pró-Labore alinhado ao Fator R (mínimo de 28% da receita bruta) garante o enquadramento no Anexo III, proporcionando a menor alíquota do Simples Nacional.</p>
     `;
 
     // Breakdowns
@@ -995,81 +902,63 @@
       <div class="bk-row"><span>Anexo utilizado</span><span>${simples.anexoUsado}${simples.fatorR!==null ? ' (Fator R: '+fmtPct(simples.fatorR*100)+')' : ''}</span></div>
       <div class="bk-row"><span>Alíquota nominal da faixa</span><span>${fmtPct(simples.aliqNominal*100)}</span></div>
       <div class="bk-row"><span>Parcela a deduzir (anual)</span><span>${fmtBRL(simples.deduz)}</span></div>
-      <div class="bk-row"><span>Alíquota efetiva</span><span>${fmtPct(simples.aliqEfetiva*100)}</span></div>
-      ${simples.cppExtra ? `<div class="bk-row"><span>CPP patronal (Anexo IV, à parte)</span><span>${fmtBRL(simples.cppExtra)}</span></div>` : ''}
+      <div class="bk-row"><span>Alíquota efetiva apurada</span><span>${fmtPct(simples.aliqEfetiva*100)}</span></div>
       <div class="bk-row"><span>Total mensal (DAS)</span><span>${fmtBRL(simples.total)}</span></div>
     `;
 
     $('bkPresumidoBody').innerHTML = `
       <div class="bk-row"><span>Base de presunção — IRPJ (${fmtPct(presumido.presIRPJ*100)})</span><span>${fmtBRL(faturamentoMensal * presumido.presIRPJ)}</span></div>
       <div class="bk-row"><span>IRPJ (15% da base)</span><span>${fmtBRL(presumido.irpj)}</span></div>
-      <div class="bk-row"><span>Adicional de IRPJ (10% sobre a base que excede R$ 20.000)</span><span>${fmtBRL(presumido.adicional)}</span></div>
+      <div class="bk-row"><span>Adicional de IRPJ (10% sobre excedente de R$ 20 mil)</span><span>${fmtBRL(presumido.adicional)}</span></div>
       <div class="bk-row"><span>CSLL (${fmtPct(presumido.presCSLL*100)} de base / 9%)</span><span>${fmtBRL(presumido.csll)}</span></div>
-      <div class="bk-row"><span>PIS (0,65% da receita)</span><span>${fmtBRL(presumido.pis)}</span></div>
-      <div class="bk-row"><span>COFINS (3% da receita)</span><span>${fmtBRL(presumido.cofins)}</span></div>
+      <div class="bk-row"><span>PIS (0,65%) + COFINS (3,00%)</span><span>${fmtBRL(presumido.pis + presumido.cofins)}</span></div>
       <div class="bk-row"><span>${presumido.servico ? 'ISS' : 'ICMS'} estimado</span><span>${fmtBRL(presumido.icmsIss)}</span></div>
-      <div class="bk-row"><span>CPP + encargos sobre a folha</span><span>${fmtBRL(presumido.cpp)}</span></div>
+      <div class="bk-row"><span>CPP sobre folha / pró-labore</span><span>${fmtBRL(presumido.cpp)}</span></div>
       <div class="bk-row"><span>Total mensal</span><span>${fmtBRL(presumido.total)}</span></div>
     `;
 
     $('bkRPABody').innerHTML = `
-      <div class="bk-row"><span>Base de lucro real (${fmtPct(rpa.margem*100)} de margem informada)</span><span>${fmtBRL(rpa.baseLucro)}</span></div>
-      <div class="bk-row"><span>IRPJ (15% da base)</span><span>${fmtBRL(rpa.irpj)}</span></div>
-      <div class="bk-row"><span>Adicional de IRPJ (10% sobre a base que excede R$ 20.000)</span><span>${fmtBRL(rpa.adicional)}</span></div>
-      <div class="bk-row"><span>CSLL (9% da base)</span><span>${fmtBRL(rpa.csll)}</span></div>
-      <div class="bk-row"><span>PIS não cumulativo (1,65%, líquido do crédito de ${fmtBRL(rpa.pisCredito)})</span><span>${fmtBRL(rpa.pis)}</span></div>
-      <div class="bk-row"><span>COFINS não cumulativo (7,6%, líquido do crédito de ${fmtBRL(rpa.cofinsCredito)})</span><span>${fmtBRL(rpa.cofins)}</span></div>
-      <div class="bk-row"><span>${rpa.servico ? 'ISS estimado (cumulativo)' : 'ICMS não cumulativo (líquido do crédito)'}</span><span>${fmtBRL(rpa.icmsIss)}</span></div>
-      <div class="bk-row"><span>CPP + encargos sobre a folha</span><span>${fmtBRL(rpa.cpp)}</span></div>
+      <div class="bk-row"><span>Base de lucro real (${fmtPct(rpa.margem*100)} de margem)</span><span>${fmtBRL(rpa.baseLucro)}</span></div>
+      <div class="bk-row"><span>IRPJ (15%) + Adicional (10%)</span><span>${fmtBRL(rpa.irpj + rpa.adicional)}</span></div>
+      <div class="bk-row"><span>CSLL (9%)</span><span>${fmtBRL(rpa.csll)}</span></div>
+      <div class="bk-row"><span>PIS + COFINS líquidos do crédito</span><span>${fmtBRL(rpa.pis + rpa.cofins)}</span></div>
+      <div class="bk-row"><span>${rpa.servico ? 'ISS' : 'ICMS líquido'}</span><span>${fmtBRL(rpa.icmsIss)}</span></div>
       <div class="bk-row"><span>Total mensal</span><span>${fmtBRL(rpa.total)}</span></div>
     `;
 
     $('bkReformaBody').innerHTML = `
-      <div class="bk-row"><span>Débito de IBS/CBS sobre a receita</span><span>${fmtBRL(reforma.debito)}</span></div>
-      <div class="bk-row"><span>Crédito sobre insumos (${creditoPctVal}% da receita)</span><span>-${fmtBRL(reforma.credito)}</span></div>
+      <div class="bk-row"><span>Débito de IBS/CBS (${ivaRateVal}%)</span><span>${fmtBRL(reforma.debito)}</span></div>
+      <div class="bk-row"><span>Crédito sobre insumos</span><span>-${fmtBRL(reforma.credito)}</span></div>
       <div class="bk-row"><span>IBS/CBS líquido</span><span>${fmtBRL(reforma.ivaLiquido)}</span></div>
-      <div class="bk-row"><span>IRPJ + adicional</span><span>${fmtBRL(reforma.irpj + reforma.adicional)}</span></div>
-      <div class="bk-row"><span>CSLL</span><span>${fmtBRL(reforma.csll)}</span></div>
-      <div class="bk-row"><span>CPP + encargos sobre a folha</span><span>${fmtBRL(reforma.cpp)}</span></div>
-      <div class="bk-row"><span>Total mensal projetado</span><span>${fmtBRL(reforma.total)}</span></div>
+      <div class="bk-row"><span>IRPJ + CSLL + CPP</span><span>${fmtBRL(reforma.irpj + reforma.adicional + reforma.csll + reforma.cpp)}</span></div>
+      <div class="bk-row"><span>Total mensal projetado (2033)</span><span>${fmtBRL(reforma.total)}</span></div>
     `;
 
-    // Créditos tomados e repassados
+    // Créditos Repassados
     const cred = calcCreditos(setor, faturamentoMensal, comprasComCredito, icmsIssPct, simples, presumido, rpa, reforma, parseFloat(pctB2B.value), parseFloat(repasseSimples.value), ivaRateVal);
-
-    const creditRows = [
+    const creditBody = $('creditBody');
+    creditBody.innerHTML = '';
+    
+    [
       { label: `Simples Nacional (Anexo ${simples.anexoUsado})`, tomado: cred.tomadoSimples, repassado: cred.repassadoSimples },
       { label: 'Lucro Presumido', tomado: cred.tomadoPresumido, repassado: cred.repassadoPresumido },
       { label: 'Lucro Real (RPA)', tomado: cred.tomadoRPA, repassado: cred.repassadoRPA },
-      { label: 'Regime pleno — IVA (2033)', tomado: cred.tomadoReforma, repassado: cred.repassadoReforma },
-    ];
-    const creditBody = $('creditBody');
-    creditBody.innerHTML = '';
-    creditRows.forEach(r => {
+      { label: 'Regime Pleno — IVA Dual (2033)', tomado: cred.tomadoReforma, repassado: cred.repassadoReforma },
+    ].forEach(r => {
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${r.label}</td><td class="num">${fmtBRL(r.tomado)}</td><td class="num">${fmtBRL(r.repassado)}</td>`;
       creditBody.appendChild(tr);
     });
 
-    const repassadoHojeMap = [cred.repassadoSimples, cred.repassadoPresumido, cred.repassadoRPA];
-    const repassadoHoje = repassadoHojeMap[best];
-    const regimeHojeLabel = rows[best].label;
-    const ganhoRepasse = cred.repassadoReforma - repassadoHoje;
-    const verdictCredito = $('verdictCredito');
-    verdictCredito.innerHTML = `
-      <h3>${repassadoHoje < cred.repassadoReforma * 0.5 ? 'Sua nota fiscal repassa pouco crédito hoje' : 'Sua nota fiscal já repassa uma parcela razoável de crédito'}</h3>
-      <p>Hoje, no ${regimeHojeLabel} (seu regime mais barato agora), seus clientes PJ do regime normal conseguem aproveitar cerca de <span class="savings">${fmtBRL(repassadoHoje)}</span> por mês em crédito sobre o que compram de você.</p>
-      <p>Em um cenário de IVA pleno, isso subiria para <span class="savings">${fmtBRL(cred.repassadoReforma)}</span> — uma diferença de <span class="savings">${fmtBRL(Math.abs(ganhoRepasse))}</span>, que tende a tornar sua nota mais competitiva para quem compra de você, especialmente se a fatia de clientes PJ crescer.</p>
-      <p>Quanto maior a parcela dos seus insumos com direito a crédito, maior também o abatimento que você mesmo consegue tomar — hoje isso já acontece de forma plena no Lucro Real, parcialmente no Presumido (via ICMS), e quase não existe no Simples.</p>
+    $('verdictCredito').innerHTML = `
+      <h3>Repasse de Créditos Tributários na Nota Fiscal</h3>
+      <p>No ${cheaper}, seus clientes PJ aproveitam cerca de <span class="savings">${fmtBRL(cred.repassadoSimples)}</span>/mês em crédito sobre o que compram de você.</p>
+      <p>Em 2027, caso algum cliente PJ solicite $100\%$ do crédito de IVA, você poderá optar pelo recolhimento do IBS/CBS "por fora" do DAS, elevando o repasse para <span class="savings">${fmtBRL(cred.repassadoReforma)}</span> sem perder o enquadramento no Simples Nacional.</p>
     `;
 
     $('bkCreditoBody').innerHTML = `
-      <div class="bk-row"><span>Compras/insumos com direito a crédito (estimado)</span><span>${fmtBRL(comprasComCredito)}</span></div>
-      <div class="bk-row"><span>Simples — crédito tomado nas compras</span><span>${fmtBRL(cred.tomadoSimples)} (regra geral: não se apropria)</span></div>
-      <div class="bk-row"><span>Presumido — crédito tomado (só ${cred.servico ? 'ISS, geralmente não gera crédito' : 'ICMS'})</span><span>${fmtBRL(cred.tomadoPresumido)}</span></div>
-      <div class="bk-row"><span>Regime pleno — crédito tomado (IBS/CBS não cumulativo)</span><span>${fmtBRL(cred.tomadoReforma)}</span></div>
-      <div class="bk-row"><span>Débito de IVA pleno destacado na nota (100% da alíquota)</span><span>${fmtBRL(cred.debitoReforma)}</span></div>
-      <div class="bk-row"><span>Parcela das vendas para clientes PJ do regime normal</span><span>${pctB2B.value}%</span></div>
+      <div class="bk-row"><span>Insumos com direito a crédito</span><span>${fmtBRL(comprasComCredito)}</span></div>
+      <div class="bk-row"><span>Parcela de vendas para clientes PJ</span><span>${pctB2B.value}%</span></div>
     `;
 
     $('results').style.display = 'block';
@@ -1077,67 +966,68 @@
     $('results').scrollIntoView({ behavior:'smooth', block:'start' });
   });
 
-  $('calcCompradorBtn').addEventListener('click', () => {
-    const valor = parseNum($('valorContratado').value) || 0;
-    const tipoOperacao = $('tipoOperacao').value;
-    const icmsCompraPct = parseNum($('icmsCompra').value);
-    const aproveita = $('aproveitaCredito').value === 'sim';
-    const momento = momentoCompra.value;
-    const hibrido = $('fornecedorHibrido').value === 'sim';
-    const repasseSimplesPct = parseFloat(repasseSimples.value);
-    const ivaRateVal = parseFloat(ivaRate.value);
-    const repasseHibridoNaoPct = parseFloat(repasseHibridoNao.value);
+  // Cálculo da Aba de Matéria-Prima
+  $('calcMPBtn').addEventListener('click', () => {
+    const valorMP = parseNum($('valorMP').value) || 0;
+    const suaEmpresaRegime = $('suaEmpresaRegime').value;
+    const repasseMPFornecedor = parseNum($('repasseMPFornecedor').value) || 3.0;
+    const ivaRateVal = parseFloat(ivaRate.value) || 26.5;
 
-    if (valor <= 0){
-      alert('Informe o valor contratado para calcular.');
+    if (valorMP <= 0) {
+      alert('Informe o valor da compra de matéria-prima.');
       return;
     }
 
-    const verdictComprador = $('verdictComprador');
-    const compradorBody = $('compradorBody');
-    compradorBody.innerHTML = '';
+    const mpBody = $('mpBody');
+    mpBody.innerHTML = '';
+    const verdictMP = $('verdictMP');
 
-    if (!aproveita){
-      verdictComprador.innerHTML = `
-        <h3>O regime do fornecedor não muda seu custo</h3>
-        <p>Como você não aproveita crédito tributário, o valor líquido de comprar de qualquer um dos três é o mesmo: <span class="savings">${fmtBRL(valor)}</span>. Nesse caso, compare só preço, prazo e qualidade.</p>
+    if (suaEmpresaRegime === 'simples') {
+      verdictMP.innerHTML = `
+        <h3>No Simples Nacional (100% DAS), o crédito não abate seu imposto</h3>
+        <p>Como a sua empresa recolhe o imposto unificado via DAS, você não toma crédito direto de IBS/CBS sobre a matéria-prima comprada. O custo líquido da compra é o valor de tabela: <span class="savings">${fmtBRL(valorMP)}</span>.</p>
+        <p>Nesta condição, você deve negociar o menor preço de tabela, prazos e qualidade, independentemente do regime do fornecedor.</p>
       `;
-      ['Simples Nacional','Lucro Presumido','Lucro Real (RPA)'].forEach(label => {
+
+      [
+        { nome: 'Fornecedor A (Lucro Real / Presumido)', credito: 0, custo: valorMP, desc: 0 },
+        { nome: 'Fornecedor B (Simples Híbrido - IVA por fora)', credito: 0, custo: valorMP, desc: 0 },
+        { nome: 'Fornecedor C (Simples 100% DAS)', credito: 0, custo: valorMP, desc: 0 },
+      ].forEach(r => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${label}</td><td class="num">${fmtBRL(0)}</td><td class="num">${fmtBRL(valor)}</td>`;
-        compradorBody.appendChild(tr);
+        tr.innerHTML = `<td>${r.nome}</td><td class="num">${fmtBRL(r.credito)}</td><td class="num">${fmtBRL(r.custo)}</td><td class="num">${fmtBRL(r.desc)}</td>`;
+        mpBody.appendChild(tr);
       });
-      $('compradorResults').style.display = 'block';
-      return;
+    } else {
+      const credCheio = valorMP * (ivaRateVal / 100);
+      const credSimples = valorMP * (repasseMPFornecedor / 100);
+
+      const custoRegimeNormal = valorMP - credCheio;
+      const custoSimplesDAS = valorMP - credSimples;
+
+      const descontoExigido = custoSimplesDAS - custoRegimeNormal;
+
+      verdictMP.innerHTML = `
+        <h3>Matéria-Prima: Comparativo de Caixa e Crédito de IVA</h3>
+        <p>Ao comprar R$ ${fmtBRL(valorMP)} em insumos de um fornecedor do <strong>Regime Normal ou Simples Híbrido</strong>, o seu caixa recupera <span class="savings">${fmtBRL(credCheio)}</span> em créditos de IVA (26,5%), deixando o custo líquido real em <span class="savings">${fmtBRL(custoRegimeNormal)}</span>.</p>
+        <p>Se comprar de um <strong>Fornecedor do Simples 100% DAS</strong>, você só recupera <span class="savings">${fmtBRL(credSimples)}</span> em crédito. Para o contrato valer a pena, o fornecedor do Simples precisa conceder um <strong>desconto de ${fmtBRL(descontoExigido)} (${fmtPct(descontoExigido/valorMP*100)})</strong> no preço da matéria-prima ou optar por apurar o IVA por fora do DAS.</p>
+      `;
+
+      const rowsMP = [
+        { nome: 'Fornecedor A (Lucro Real / Presumido)', credito: credCheio, custo: custoRegimeNormal, desc: 0, best: true },
+        { nome: 'Fornecedor B (Simples Híbrido - IVA por fora)', credito: credCheio, custo: custoRegimeNormal, desc: 0, best: true },
+        { nome: 'Fornecedor C (Simples 100% DAS)', credito: credSimples, custo: custoSimplesDAS, desc: descontoExigido, best: false },
+      ];
+
+      rowsMP.forEach(r => {
+        const tr = document.createElement('tr');
+        if (r.best) tr.className = 'best';
+        tr.innerHTML = `<td>${r.nome}</td><td class="num">${fmtBRL(r.credito)}</td><td class="num">${fmtBRL(r.custo)}</td><td class="num">${r.desc > 0 ? fmtBRL(r.desc) : '—'}</td>`;
+        mpBody.appendChild(tr);
+      });
     }
 
-    const r = calcComprador(valor, tipoOperacao, icmsCompraPct, momento, hibrido, repasseSimplesPct, ivaRateVal, repasseHibridoNaoPct);
-    const rows = [
-      { label: 'Simples Nacional', ...r.simples },
-      { label: 'Lucro Presumido', ...r.presumido },
-      { label: 'Lucro Real (RPA)', ...r.rpa },
-    ];
-    let best = 0;
-    rows.forEach((row, i) => { if (row.custoLiquido < rows[best].custoLiquido) best = i; });
-
-    rows.forEach((row, i) => {
-      const tr = document.createElement('tr');
-      if (i === best) tr.className = 'best';
-      tr.innerHTML = `<td>${row.label}</td><td class="num">${fmtBRL(row.credito)}</td><td class="num">${fmtBRL(row.custoLiquido)}</td>`;
-      compradorBody.appendChild(tr);
-    });
-
-    const diff = Math.max(...rows.map(r=>r.custoLiquido)) - Math.min(...rows.map(r=>r.custoLiquido));
-    const momentoLabel = momento === 'hoje' ? 'hoje' : 'no cenário de IVA pleno (2033)';
-    verdictComprador.innerHTML = `
-      <h3>${momentoLabel === 'hoje' ? 'Hoje' : 'Na reforma plena'}, comprar de um fornecedor do ${rows[best].label} sai mais barato pra você</h3>
-      <p>Considerando o mesmo preço de tabela, a diferença de custo líquido entre a melhor e a pior opção é de <span class="savings">${fmtBRL(diff)}</span> por mês — só por causa do crédito que sobra pra você.</p>
-      <p>${momento === 'hoje'
-        ? 'Fornecedores do Lucro Real tendem a gerar mais crédito hoje porque já operam em regime não cumulativo pleno; o Simples costuma gerar pouco ou nenhum crédito de PIS/COFINS.'
-        : (hibrido ? 'Como você assumiu que o fornecedor do Simples opta pelo regime híbrido, o crédito fica equivalente ao dos demais regimes.' : 'Como o fornecedor do Simples permaneceu totalmente dentro do DAS, ele ainda repassa menos crédito do que um fornecedor do regime normal — mude a opção acima para comparar o cenário híbrido.')}</p>
-    `;
-
-    $('compradorResults').style.display = 'block';
+    $('mpResults').style.display = 'block';
   });
 })();
 </script>
