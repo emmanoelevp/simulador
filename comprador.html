@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador do Comprador — Quanto de crédito sobra pra você | EVP</title>
+<meta name="description" content="Descubra quanto de crédito tributário sobra pra você dependendo do regime do fornecedor ou prestador que você contrata.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc">
+    <div class="doc-top">
+      <span>EVP · PLANEJAMENTO TRIBUTÁRIO</span>
+      <span id="today"></span>
+    </div>
+    <h1 class="title">Simulador do<br>Comprador <em>EVP</em></h1>
+    <p class="subtitle">Você compra produtos ou contrata serviços? O regime tributário de quem vende pra você muda quanto de crédito sobra no seu bolso — veja o efeito aqui.</p>
+    <div class="doc-meta">
+      <span>Base legal: <strong>EC 132/2023 · LC 214/2025</strong></span>
+      <span>Transição: <strong>2026 – 2033</strong></span>
+      <span>Cálculo: <strong>100% no navegador</strong></span>
+    </div>
+    <p class="sheet-note" style="margin-top:18px;"><a href="index.html">← Voltar ao simulador de quem vende/presta serviço</a></p>
+  </header>
+
+  <section class="sheet" id="form-section">
+    <div class="sheet-head">
+      <span class="sheet-num">01</span>
+      <h2>A compra ou contratação</h2>
+    </div>
+    <p class="sheet-note">Aqui a pergunta muda de lado: se <strong>você</strong> compra um produto ou contrata um serviço, o regime do seu fornecedor muda o quanto sobra pra você em crédito — e isso pode compensar um preço maior ou menor.</p>
+
+    <div class="grid">
+      <div class="field span2">
+        <label for="valorContratado">Valor mensal do que você compra ou contrata (R$)
+          <span class="hint">Considere o mesmo valor para os três fornecedores, para comparar só o efeito do crédito</span>
+        </label>
+        <input type="text" inputmode="numeric" id="valorContratado" value="20000">
+      </div>
+
+      <div class="field">
+        <label for="tipoOperacao">Tipo de operação
+          <span class="hint">Produto gera ICMS; serviço em geral gera ISS</span>
+        </label>
+        <select id="tipoOperacao">
+          <option value="produto">Compra de produto/mercadoria</option>
+          <option value="servico">Contratação de serviço</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="icmsCompra">Alíquota de ICMS da operação (%)
+          <span class="hint">Depende da tabela do seu estado/NCM — só é usada se for produto</span>
+        </label>
+        <input type="text" inputmode="decimal" id="icmsCompra" value="18">
+      </div>
+
+      <div class="field">
+        <label for="aproveitaCredito">Você aproveita crédito tributário?
+          <span class="hint">Só faz diferença se você for contribuinte do regime normal</span>
+        </label>
+        <select id="aproveitaCredito">
+          <option value="sim">Sim, sou do regime normal</option>
+          <option value="nao">Não (Simples, ou consumidor final)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="momentoCompra">Momento da simulação</label>
+        <select id="momentoCompra">
+          <option value="hoje">Hoje (regras atuais)</option>
+          <option value="reforma">Reforma em regime pleno (2033)</option>
+        </select>
+      </div>
+
+      <div class="field" id="hibridoField" style="display:none;">
+        <label for="fornecedorHibrido">Se o fornecedor for do Simples
+          <span class="hint">A partir de 2027 ele pode optar por apurar o IBS/CBS por fora do DAS</span>
+        </label>
+        <select id="fornecedorHibrido">
+          <option value="nao">Continua tudo dentro do DAS</option>
+          <option value="sim">Apura o IBS/CBS por fora (híbrido)</option>
+        </select>
+      </div>
+
+      <div class="field span2" id="repasseSimplesField">
+        <label for="repasseSimples">Hoje, se o fornecedor for do Simples, quanto de crédito ele repassa (%)
+          <span class="hint">Para produto (Anexos I/II), a LC 123 art. 23 costuma girar entre 30% e 34% da alíquota efetiva do DAS; para serviço, o ISS normalmente não gera crédito — deixe baixo ou zero</span>
+        </label>
+        <div class="range-row">
+          <input type="range" id="repasseSimples" min="0" max="100" value="15">
+          <output id="repasseSimplesOut">15%</output>
+        </div>
+      </div>
+
+      <div class="field span2" id="ivaRateField" style="display:none;">
+        <label for="ivaRate">Alíquota de referência do IVA dual (CBS + IBS) em regime pleno (%)
+          <span class="hint">Estimativa de mercado para 2033; ajuste conforme estudos mais recentes</span>
+        </label>
+        <div class="range-row">
+          <input type="range" id="ivaRate" min="20" max="30" step="0.1" value="26.5">
+          <output id="ivaRateOut">26,5%</output>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="calc" id="calcCompradorBtn">Simular contratação</button>
+      <span class="btn-caption">Nada é enviado a servidor algum — o cálculo roda só no seu navegador.</span>
+    </div>
+  </section>
+
+  <section class="sheet" id="results-section">
+    <div class="sheet-head">
+      <span class="sheet-num">02</span>
+      <h2>Resultado da simulação</h2>
+    </div>
+
+    <div id="compradorResults" style="display:none;">
+      <div class="verdict" id="verdictComprador"></div>
+      <table class="compare" id="compradorTable">
+        <caption>Custo líquido estimado, por regime do fornecedor</caption>
+        <thead>
+          <tr>
+            <th>Fornecedor</th>
+            <th class="num">Crédito recuperável</th>
+            <th class="num">Custo líquido</th>
+          </tr>
+        </thead>
+        <tbody id="compradorBody"></tbody>
+      </table>
+      <p class="reform-note">"Crédito recuperável" é o quanto você consegue abater do que compra ou contrata, se você for contribuinte do regime normal. Quanto maior o crédito, menor o custo líquido efetivo da compra — mesmo que o preço de tabela seja igual entre fornecedores.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong>Isto é uma estimativa educacional, não uma orientação tributária definitiva.</strong> O simulador usa um modelo simplificado da repartição de créditos entre regimes; a integração final do IBS/CBS ao Simples Nacional ainda está sendo regulamentada e pode mudar até 2033. Antes de decidir com base no crédito recuperável, confirme os números com um contador.</p>
+    <p>Simulador Tributário EVP — ferramenta estática, sem coleta de dados, hospedada no GitHub Pages.</p>
+  </footer>
+
+</div>
+
+<script src="helpers.js"></script>
+<script>
+(function(){
+  const $ = (id) => document.getElementById(id);
+
+  $('today').textContent = new Date().toLocaleDateString('pt-BR', { year:'numeric', month:'long', day:'numeric' });
+
+  // ---------- Simulação do comprador/contratante ----------
+  function calcComprador(valor, tipoOperacao, icmsCompraPct, momento, fornecedorHibrido, repasseSimplesPct, ivaRateVal){
+    const produto = tipoOperacao === 'produto';
+    let creditoSimples, creditoPresumido, creditoRPA;
+
+    if (momento === 'hoje'){
+      creditoSimples = valor * (repasseSimplesPct / 100);
+      creditoPresumido = produto ? valor * (icmsCompraPct / 100) : 0;
+      creditoRPA = produto
+        ? valor * ((icmsCompraPct / 100) + 0.0165 + 0.076)
+        : valor * (0.0165 + 0.076);
+    } else {
+      const ivaLiquidoRate = ivaRateVal / 100;
+      creditoRPA = valor * ivaLiquidoRate;
+      creditoPresumido = valor * ivaLiquidoRate;
+      creditoSimples = fornecedorHibrido ? valor * ivaLiquidoRate : valor * ivaLiquidoRate * 0.6;
+    }
+
+    return {
+      simples: { credito: creditoSimples, custoLiquido: valor - creditoSimples },
+      presumido: { credito: creditoPresumido, custoLiquido: valor - creditoPresumido },
+      rpa: { credito: creditoRPA, custoLiquido: valor - creditoRPA },
+    };
+  }
+
+  // ---------- UI wiring ----------
+  const repasseSimples = $('repasseSimples'), repasseSimplesOut = $('repasseSimplesOut');
+  repasseSimples.addEventListener('input', () => repasseSimplesOut.textContent = repasseSimples.value + '%');
+
+  const ivaRate = $('ivaRate'), ivaRateOut = $('ivaRateOut');
+  ivaRate.addEventListener('input', () => ivaRateOut.textContent = parseFloat(ivaRate.value).toLocaleString('pt-BR',{minimumFractionDigits:1}) + '%');
+
+  const momentoCompra = $('momentoCompra'), hibridoField = $('hibridoField');
+  const repasseSimplesField = $('repasseSimplesField'), ivaRateField = $('ivaRateField');
+  momentoCompra.addEventListener('change', () => {
+    const reforma = momentoCompra.value === 'reforma';
+    hibridoField.style.display = reforma ? 'flex' : 'none';
+    repasseSimplesField.style.display = reforma ? 'none' : 'flex';
+    ivaRateField.style.display = reforma ? 'flex' : 'none';
+  });
+
+  $('calcCompradorBtn').addEventListener('click', () => {
+    const valor = parseNum($('valorContratado').value) || 0;
+    const tipoOperacao = $('tipoOperacao').value;
+    const icmsCompraPct = parseNum($('icmsCompra').value);
+    const aproveita = $('aproveitaCredito').value === 'sim';
+    const momento = momentoCompra.value;
+    const hibrido = $('fornecedorHibrido').value === 'sim';
+    const repasseSimplesPct = parseFloat(repasseSimples.value);
+    const ivaRateVal = parseFloat(ivaRate.value);
+
+    if (valor <= 0){
+      alert('Informe o valor contratado para calcular.');
+      return;
+    }
+
+    const verdictComprador = $('verdictComprador');
+    const compradorBody = $('compradorBody');
+    compradorBody.innerHTML = '';
+
+    if (!aproveita){
+      verdictComprador.innerHTML = `
+        <h3>O regime do fornecedor não muda seu custo</h3>
+        <p>Como você não aproveita crédito tributário, o valor líquido de comprar de qualquer um dos três é o mesmo: <span class="savings">${fmtBRL(valor)}</span>. Nesse caso, compare só preço, prazo e qualidade.</p>
+      `;
+      ['Simples Nacional','Lucro Presumido','Lucro Real (RPA)'].forEach(label => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${label}</td><td class="num">${fmtBRL(0)}</td><td class="num">${fmtBRL(valor)}</td>`;
+        compradorBody.appendChild(tr);
+      });
+      $('compradorResults').style.display = 'block';
+      $('compradorResults').scrollIntoView({ behavior:'smooth', block:'start' });
+      return;
+    }
+
+    const r = calcComprador(valor, tipoOperacao, icmsCompraPct, momento, hibrido, repasseSimplesPct, ivaRateVal);
+    const rows = [
+      { label: 'Simples Nacional', ...r.simples },
+      { label: 'Lucro Presumido', ...r.presumido },
+      { label: 'Lucro Real (RPA)', ...r.rpa },
+    ];
+    let best = 0;
+    rows.forEach((row, i) => { if (row.custoLiquido < rows[best].custoLiquido) best = i; });
+
+    rows.forEach((row, i) => {
+      const tr = document.createElement('tr');
+      if (i === best) tr.className = 'best';
+      tr.innerHTML = `<td>${row.label}</td><td class="num">${fmtBRL(row.credito)}</td><td class="num">${fmtBRL(row.custoLiquido)}</td>`;
+      compradorBody.appendChild(tr);
+    });
+
+    const diff = Math.max(...rows.map(r=>r.custoLiquido)) - Math.min(...rows.map(r=>r.custoLiquido));
+    const momentoLabel = momento === 'hoje' ? 'hoje' : 'no cenário de IVA pleno (2033)';
+    verdictComprador.innerHTML = `
+      <h3>${momentoLabel === 'hoje' ? 'Hoje' : 'Na reforma plena'}, comprar de um fornecedor do ${rows[best].label} sai mais barato pra você</h3>
+      <p>Considerando o mesmo preço de tabela, a diferença de custo líquido entre a melhor e a pior opção é de <span class="savings">${fmtBRL(diff)}</span> por mês — só por causa do crédito que sobra pra você.</p>
+      <p>${momento === 'hoje'
+        ? 'Fornecedores do Lucro Real tendem a gerar mais crédito hoje porque já operam em regime não cumulativo pleno; o Simples costuma gerar pouco ou nenhum crédito de PIS/COFINS, exceto ICMS em produto, quando a alíquota informada acima reflete a repartição real da faixa do fornecedor.'
+        : (hibrido ? 'Como você assumiu que o fornecedor do Simples opta pelo regime híbrido, o crédito fica equivalente ao dos demais regimes.' : 'Como o fornecedor do Simples permaneceu totalmente dentro do DAS, ele ainda repassa menos crédito do que um fornecedor do regime normal — mude a opção acima para comparar o cenário híbrido.')}</p>
+    `;
+
+    $('compradorResults').style.display = 'block';
+    $('compradorResults').scrollIntoView({ behavior:'smooth', block:'start' });
+  });
+})();
+</script>
+</body>
+</html>

@@ -6,360 +6,7 @@
 <title>Simulador Tributário EVP</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --paper: #efeee4;
-    --paper-raised: #f7f6ee;
-    --ink: #1e2a22;
-    --ink-soft: #4b5a4f;
-    --rule: #c9c4b2;
-    --rule-strong: #a9a38c;
-    --brass: #a8792e;
-    --brass-dark: #7e5b1f;
-    --brick: #8b3a3a;
-    --forest: #3c5a41;
-    --serif: 'Source Serif 4', serif;
-    --sans: 'IBM Plex Sans', sans-serif;
-    --mono: 'IBM Plex Mono', monospace;
-  }
-
-  *{ box-sizing: border-box; }
-  html{ scroll-behavior: smooth; }
-
-  body{
-    margin:0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--sans);
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  body::before{
-    content:"";
-    position: fixed;
-    inset:0;
-    pointer-events:none;
-    background-image:
-      linear-gradient(var(--rule) 1px, transparent 1px);
-    background-size: 100% 42px;
-    opacity: .05;
-    z-index: 0;
-  }
-
-  .wrap{
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 24px 96px;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* ---------- Header / document block ---------- */
-  header.doc{
-    border-bottom: 2px solid var(--ink);
-    padding: 40px 0 22px;
-    margin-bottom: 40px;
-  }
-  .doc-top{
-    display:flex;
-    justify-content: space-between;
-    align-items: baseline;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--ink-soft);
-    letter-spacing: .02em;
-    margin-bottom: 22px;
-  }
-  h1.title{
-    font-family: var(--serif);
-    font-weight: 700;
-    font-size: clamp(34px, 5.5vw, 54px);
-    line-height: 1.05;
-    margin: 0 0 12px;
-    letter-spacing: -0.01em;
-  }
-  h1.title em{
-    font-style: normal;
-    color: var(--brass-dark);
-  }
-  .subtitle{
-    max-width: 60ch;
-    font-size: 16.5px;
-    color: var(--ink-soft);
-    margin: 0;
-  }
-  .doc-meta{
-    margin-top: 24px;
-    display:flex;
-    gap: 32px;
-    flex-wrap: wrap;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--ink-soft);
-  }
-  .doc-meta strong{ color: var(--ink); font-weight: 500; }
-
-  /* ---------- Section framing (form as ledger) ---------- */
-  section.sheet{
-    border-top: 1px solid var(--rule-strong);
-    padding-top: 28px;
-    margin-top: 36px;
-  }
-  .sheet-head{
-    display:flex;
-    align-items:baseline;
-    gap: 14px;
-    margin-bottom: 22px;
-  }
-  .sheet-num{
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--brass-dark);
-    border: 1px solid var(--brass-dark);
-    padding: 2px 8px;
-    flex-shrink:0;
-  }
-  .sheet-head h2{
-    font-family: var(--serif);
-    font-weight: 600;
-    font-size: 24px;
-    margin: 0;
-  }
-  .sheet-note{
-    font-size: 13.5px;
-    color: var(--ink-soft);
-    margin: -10px 0 22px 46px;
-    max-width: 56ch;
-  }
-
-  /* ---------- Fields ---------- */
-  .grid{
-    display:grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px 28px;
-  }
-  .grid.full{ grid-template-columns: 1fr; }
-  .field{ display:flex; flex-direction:column; gap:6px; }
-  .field.span2{ grid-column: 1 / -1; }
-  label{
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--ink);
-  }
-  label .hint{
-    display:block;
-    font-weight: 400;
-    color: var(--ink-soft);
-    font-size: 12px;
-    margin-top: 2px;
-  }
-  input[type="text"], input[type="number"], select{
-    font-family: var(--mono);
-    font-size: 15px;
-    padding: 10px 12px;
-    border: 1px solid var(--rule-strong);
-    background: var(--paper-raised);
-    color: var(--ink);
-    border-radius: 0;
-    width: 100%;
-  }
-  select{ font-family: var(--sans); font-size: 14.5px; }
-  input:focus, select:focus{
-    outline: 2px solid var(--brass);
-    outline-offset: 1px;
-    border-color: var(--brass);
-  }
-  input[type="range"]{
-    width: 100%;
-    accent-color: var(--brass-dark);
-  }
-  .range-row{
-    display:flex; align-items:center; gap:14px;
-  }
-  .range-row output{
-    font-family: var(--mono);
-    font-size: 15px;
-    min-width: 58px;
-    text-align:right;
-  }
-
-  .btn-row{
-    margin-top: 34px;
-    display:flex;
-    align-items:center;
-    gap: 18px;
-    flex-wrap: wrap;
-  }
-  button.calc{
-    font-family: var(--sans);
-    font-weight: 600;
-    font-size: 15px;
-    background: var(--ink);
-    color: var(--paper);
-    border: none;
-    padding: 14px 26px;
-    cursor: pointer;
-    letter-spacing: .01em;
-  }
-  button.calc:hover{ background: var(--brass-dark); }
-  .btn-caption{ font-size: 13px; color: var(--ink-soft); }
-
-  /* ---------- Results ---------- */
-  #results{ display:none; }
-
-  .tabs{
-    display:flex;
-    gap: 4px;
-    margin-bottom: -1px;
-  }
-  .tab-btn{
-    font-family: var(--sans);
-    font-weight: 500;
-    font-size: 14px;
-    background: var(--paper);
-    color: var(--ink-soft);
-    border: 1px solid var(--rule-strong);
-    border-bottom: none;
-    padding: 10px 18px 12px;
-    cursor: pointer;
-    position: relative;
-    top: 1px;
-  }
-  .tab-btn.active{
-    background: var(--paper-raised);
-    color: var(--ink);
-    font-weight: 600;
-    border-color: var(--ink);
-  }
-  .tab-btn:not(.active):hover{ color: var(--ink); }
-  .tab-panel{
-    border: 1px solid var(--ink);
-    border-top-color: var(--ink);
-    padding: 26px 24px 6px;
-    background: var(--paper-raised);
-  }
-  .verdict{
-    border: 2px solid var(--ink);
-    padding: 26px 26px 24px;
-    margin-bottom: 32px;
-    position: relative;
-    background: var(--paper-raised);
-  }
-  .verdict::before{
-    content: "PARECER";
-    position:absolute;
-    top:-11px; left: 22px;
-    background: var(--paper-raised);
-    padding: 0 8px;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: .08em;
-    color: var(--brass-dark);
-  }
-  .verdict h3{
-    font-family: var(--serif);
-    font-size: 22px;
-    margin: 4px 0 10px;
-  }
-  .verdict p{ margin: 0 0 10px; color: var(--ink-soft); font-size: 14.5px; }
-  .verdict p:last-child{ margin-bottom: 0; }
-  .verdict .savings{
-    font-family: var(--mono);
-    color: var(--forest);
-    font-weight: 600;
-  }
-  .verdict .savings.negative{ color: var(--brick); }
-
-  table.compare{
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 28px;
-    font-size: 14.5px;
-  }
-  table.compare caption{
-    text-align:left;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--ink-soft);
-    margin-bottom: 8px;
-  }
-  table.compare th, table.compare td{
-    border-bottom: 1px solid var(--rule);
-    padding: 10px 8px;
-    text-align: right;
-  }
-  table.compare th:first-child, table.compare td:first-child{
-    text-align:left;
-  }
-  table.compare thead th{
-    font-weight: 600;
-    border-bottom: 2px solid var(--ink);
-    color: var(--ink-soft);
-    font-size: 12.5px;
-    text-transform: none;
-  }
-  table.compare td.num, table.compare th.num{ font-family: var(--mono); }
-  table.compare tr.best td{ font-weight: 600; color: var(--forest); }
-  table.compare tr.best td:first-child::after{
-    content: " ◆ menor carga hoje";
-    font-family: var(--sans);
-    font-weight: 400;
-    font-size: 11.5px;
-    color: var(--forest);
-  }
-
-  details.breakdown{
-    border: 1px solid var(--rule-strong);
-    padding: 14px 18px;
-    margin-bottom: 14px;
-    background: var(--paper-raised);
-  }
-  details.breakdown summary{
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
-    list-style: none;
-  }
-  details.breakdown summary::-webkit-details-marker{ display:none; }
-  details.breakdown summary::before{
-    content: "+ ";
-    font-family: var(--mono);
-    color: var(--brass-dark);
-  }
-  details.breakdown[open] summary::before{ content: "– "; }
-  .bk-row{
-    display:flex; justify-content: space-between;
-    font-family: var(--mono);
-    font-size: 13px;
-    padding: 6px 0;
-    border-bottom: 1px dashed var(--rule);
-  }
-  .bk-row:last-child{ border-bottom:none; font-weight:600; padding-top:10px; }
-  .bk-row span:first-child{ font-family: var(--sans); color: var(--ink-soft); }
-
-  .reform-note{
-    font-size: 13.5px;
-    color: var(--ink-soft);
-    border-left: 3px solid var(--brass);
-    padding: 4px 0 4px 16px;
-    margin: 18px 0 0;
-  }
-
-  footer{
-    margin-top: 60px;
-    padding-top: 22px;
-    border-top: 1px solid var(--rule-strong);
-    font-size: 12.5px;
-    color: var(--ink-soft);
-  }
-  footer p{ max-width: 72ch; margin: 0 0 10px; }
-
-  @media (max-width: 640px){
-    .grid{ grid-template-columns: 1fr; }
-    .sheet-note{ margin-left: 0; }
-  }
-</style>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="wrap">
@@ -497,12 +144,12 @@
       </div>
 
       <div class="field span2">
-        <label for="repasseSimples">Hoje, quanto do seu imposto o cliente PJ consegue aproveitar como crédito (%)
-          <span class="hint">No Simples isso costuma ser baixo ou zero, pois o DAS não destaca ICMS/PIS/COFINS separadamente</span>
+        <label for="repasseSimples">Só para serviços (Anexos III/IV/V): quanto do ISS o cliente PJ consegue aproveitar como crédito hoje (%)
+          <span class="hint">Para Comércio/Indústria (Anexos I/II) o simulador já calcula esse valor automaticamente, pelo ICMS embutido na alíquota efetiva (LC 123 art. 23). O ISS normalmente não gera crédito ao cliente — use este campo só se souber de uma regra municipal específica.</span>
         </label>
         <div class="range-row">
-          <input type="range" id="repasseSimples" min="0" max="100" value="15">
-          <output id="repasseSimplesOut">15%</output>
+          <input type="range" id="repasseSimples" min="0" max="100" value="0">
+          <output id="repasseSimplesOut">0%</output>
         </div>
       </div>
     </div>
@@ -522,11 +169,10 @@
     <div class="tabs" role="tablist">
       <button class="tab-btn active" id="tabBtnCarga" role="tab" aria-selected="true">Carga tributária</button>
       <button class="tab-btn" id="tabBtnCredito" role="tab" aria-selected="false">Créditos tomados e repassados</button>
-      <button class="tab-btn" id="tabBtnComprador" role="tab" aria-selected="false">Visão de quem contrata</button>
     </div>
 
     <div class="tab-panel" id="panelCarga">
-      <div class="verdict" id="verdict" aria-live="polite"></div>
+      <div class="verdict" id="verdict"></div>
 
       <table class="compare" id="compareTable">
         <caption>Carga tributária mensal estimada, por regime</caption>
@@ -564,7 +210,7 @@
     </div>
 
     <div class="tab-panel" id="panelCredito" hidden>
-      <div class="verdict" id="verdictCredito" aria-live="polite"></div>
+      <div class="verdict" id="verdictCredito"></div>
 
       <table class="compare" id="creditTable">
         <caption>Crédito tributário mensal, por regime</caption>
@@ -586,91 +232,18 @@
       <p class="reform-note">"Crédito tomado" é o quanto sua empresa consegue abater de imposto ao comprar insumos ou mercadorias. "Crédito repassado" é o quanto do imposto embutido na sua nota o seu cliente PJ do regime normal consegue usar para abater o imposto dele — quanto maior esse número, mais competitiva fica sua nota fiscal para quem compra de você.</p>
     </div>
 
-    <div class="tab-panel" id="panelComprador" hidden>
-      <p class="sheet-note" style="margin:0 0 20px;">Aqui a pergunta muda de lado: se <strong>você</strong> compra um produto ou contrata um serviço, o regime do seu fornecedor muda o quanto sobra pra você em crédito — e isso pode compensar um preço maior ou menor.</p>
+  </section>
 
-      <div class="grid">
-        <div class="field span2">
-          <label for="valorContratado">Valor mensal do que você compra ou contrata (R$)
-            <span class="hint">Considere o mesmo valor para os três fornecedores, para comparar só o efeito do crédito</span>
-          </label>
-          <input type="text" inputmode="numeric" id="valorContratado" value="20000">
-        </div>
-
-        <div class="field">
-          <label for="tipoOperacao">Tipo de operação
-            <span class="hint">Produto gera ICMS; serviço em geral gera ISS</span>
-          </label>
-          <select id="tipoOperacao">
-            <option value="produto">Compra de produto/mercadoria</option>
-            <option value="servico">Contratação de serviço</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="icmsCompra">Alíquota de ICMS da operação (%)
-            <span class="hint">Depende da tabela do seu estado/NCM — só é usada se for produto</span>
-          </label>
-          <input type="text" inputmode="decimal" id="icmsCompra" value="18">
-        </div>
-
-        <div class="field">
-          <label for="aproveitaCredito">Você aproveita crédito tributário?
-            <span class="hint">Só faz diferença se você for contribuinte do regime normal</span>
-          </label>
-          <select id="aproveitaCredito">
-            <option value="sim">Sim, sou do regime normal</option>
-            <option value="nao">Não (Simples, ou consumidor final)</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="momentoCompra">Momento da simulação</label>
-          <select id="momentoCompra">
-            <option value="hoje">Hoje (regras atuais)</option>
-            <option value="reforma">Reforma em regime pleno (2033)</option>
-          </select>
-        </div>
-
-        <div class="field" id="hibridoField" style="display:none;">
-          <label for="fornecedorHibrido">Se o fornecedor for do Simples
-            <span class="hint">A partir de 2027 ele pode optar por apurar o IBS/CBS por fora do DAS</span>
-          </label>
-          <select id="fornecedorHibrido">
-            <option value="nao">Continua tudo dentro do DAS</option>
-            <option value="sim">Apura o IBS/CBS por fora (híbrido)</option>
-          </select>
-        </div>
-
-        <div class="field span2" id="repasseHibridoField" style="display:none;">
-          <label for="repasseHibridoNao">Se o fornecedor do Simples continuar 100% no DAS, quanto do IVA pleno ele ainda repassa como crédito (%)
-            <span class="hint">Estimativa própria, ajustável — a regulamentação definitiva da apropriação de crédito no Simples ainda não está fechada</span>
-          </label>
-          <div class="range-row">
-            <input type="range" id="repasseHibridoNao" min="0" max="100" value="60">
-            <output id="repasseHibridoNaoOut">60%</output>
-          </div>
-        </div>
-      </div>
-
-      <div class="btn-row">
-        <button class="calc" id="calcCompradorBtn">Simular contratação</button>
-      </div>
-
-      <div id="compradorResults" style="display:none; margin-top:28px;">
-        <div class="verdict" id="verdictComprador" aria-live="polite"></div>
-        <table class="compare" id="compradorTable">
-          <caption>Custo líquido estimado, por regime do fornecedor</caption>
-          <thead>
-            <tr>
-              <th>Fornecedor</th>
-              <th class="num">Crédito recuperável</th>
-              <th class="num">Custo líquido</th>
-            </tr>
-          </thead>
-          <tbody id="compradorBody"></tbody>
-        </table>
-      </div>
+  <section class="sheet" id="comprador-nav">
+    <div class="sheet-head">
+      <span class="sheet-num">04</span>
+      <h2>Do outro lado da mesa</h2>
+    </div>
+    <p class="sheet-note">
+      Esta página simula a carga tributária de quem <strong>vende ou presta serviço</strong>. Se você quer entender o efeito do lado de quem <strong>compra ou contrata</strong> — ou seja, quanto de crédito sobra dependendo do regime do fornecedor — isso agora tem uma visão própria.
+    </p>
+    <div class="btn-row">
+      <a class="calc" style="text-decoration:none; display:inline-block;" href="comprador.html">Abrir simulador do comprador →</a>
     </div>
   </section>
 
@@ -681,20 +254,14 @@
 
 </div>
 
+<script src="helpers.js"></script>
 <script>
 (function(){
   const $ = (id) => document.getElementById(id);
 
   $('today').textContent = new Date().toLocaleDateString('pt-BR', { year:'numeric', month:'long', day:'numeric' });
 
-  const fmtBRL = (v) => v.toLocaleString('pt-BR', { style:'currency', currency:'BRL', maximumFractionDigits:0 });
-  const fmtPct = (v) => v.toLocaleString('pt-BR', { minimumFractionDigits:1, maximumFractionDigits:2 }) + '%';
-  const parseNum = (str) => {
-    if (!str) return 0;
-    const cleaned = String(str).replace(/[^\d.,-]/g,'').replace(/\.(?=\d{3})/g,'').replace(',','.');
-    const n = parseFloat(cleaned);
-    return isNaN(n) ? 0 : n;
-  };
+  // fmtBRL, fmtPct e parseNum agora vêm de helpers.js (compartilhado com comprador.html)
 
   // ---------- Simples Nacional tables (LC 123/2006, faixas vigentes) ----------
   const TABLES = {
@@ -706,14 +273,28 @@
   };
 
   function faixaFor(table, rbt12){
-    for (const [limit, aliq, deduz] of table){
-      if (rbt12 <= limit) return { limit, aliq, deduz, acimaDoTeto: false };
+    for (let i = 0; i < table.length; i++){
+      const [limit, aliq, deduz] = table[i];
+      if (rbt12 <= limit) return { index: i, limit, aliq, deduz, excedeuTeto: false };
     }
-    // RBT12 acima de R$ 4.800.000: fora do teto do Simples. Usamos a última
-    // faixa como referência aproximada e sinalizamos para exibir o aviso.
-    const last = table[table.length - 1];
-    return { limit: last[0], aliq: last[1], deduz: last[2], acimaDoTeto: true };
+    // RBT12 acima de R$ 4.800.000: a empresa já estaria excluída do Simples.
+    // Em vez de quebrar (bug anterior retornava null aqui), usamos a última
+    // faixa como referência ilustrativa e sinalizamos o excesso de teto.
+    const i = table.length - 1;
+    const [limit, aliq, deduz] = table[i];
+    return { index: i, limit, aliq, deduz, excedeuTeto: true };
   }
+
+  // Percentual de ICMS/ISS embutido na alíquota efetiva do Simples, por
+  // anexo e faixa (Resolução CGSN — Anexos I a V, tabelas de repartição).
+  // Usado para calcular com precisão o crédito de ICMS que a LC 123/2006,
+  // art. 23, permite repassar ao cliente PJ do regime normal (só Anexos
+  // I e II geram esse crédito; ISS, nos Anexos III/IV/V, normalmente não
+  // gera crédito ao cliente, por isso não entra aqui).
+  const REPARTICAO_ICMS = {
+    I:  [0.340, 0.340, 0.335, 0.335, 0.335, 0],
+    II: [0.320, 0.320, 0.320, 0.320, 0.320, 0],
+  };
 
   function calcSimples(anexoInput, setor, rbt12, faturamentoMensal, folha12){
     let anexoUsado = anexoInput;
@@ -731,9 +312,16 @@
       cppExtra = 0.20 * (folha12 / 12);
       dasMensal += cppExtra;
     }
+    // Parte do DAS (antes do CPP à parte do Anexo IV) que corresponde a
+    // ICMS — só existe para Anexos I e II (produto). É a base do crédito
+    // que a LC 123/2006, art. 23, permite repassar ao cliente PJ.
+    const reparticaoIcmsPct = REPARTICAO_ICMS[anexoUsado] ? REPARTICAO_ICMS[anexoUsado][f.index] : null;
+    const valorIcmsNoDas = reparticaoIcmsPct !== null ? dasMensal * reparticaoIcmsPct : null;
     return {
       anexoUsado, fatorR, aliqNominal: f.aliq, deduz: f.deduz, aliqEfetiva,
-      dasMensal, cppExtra, total: dasMensal, acimaDoTeto: f.acimaDoTeto
+      dasMensal, cppExtra, total: dasMensal,
+      faixaIndex: f.index, excedeuTeto: f.excedeuTeto,
+      reparticaoIcmsPct, valorIcmsNoDas
     };
   }
 
@@ -815,8 +403,15 @@
     const tomadoRPA = rpa.pisCredito + rpa.cofinsCredito + (servico ? 0 : rpa.icmsCredito); // não cumulativo pleno, já hoje
     const tomadoReforma = reforma.credito; // IBS/CBS não cumulativo pleno
 
-    // Crédito repassado ao cliente PJ do regime normal (pondera pela fatia B2B)
-    const repassadoSimples = simples.total * (repasseSimplesPct / 100) * b2b;
+    // Crédito repassado ao cliente PJ do regime normal (pondera pela fatia B2B).
+    // Para Anexos I/II (produto), usamos o valor real de ICMS embutido no DAS
+    // (LC 123/2006, art. 23) em vez de uma estimativa manual. Para Anexos
+    // III/IV/V (serviço), o ISS normalmente não gera crédito ao cliente da
+    // mesma forma que o ICMS, então mantemos o percentual manual como
+    // estimativa de referência (ex.: municípios com regras específicas).
+    const repassadoSimples = simples.valorIcmsNoDas !== null
+      ? simples.valorIcmsNoDas * b2b
+      : simples.total * (repasseSimplesPct / 100) * b2b;
     const repassadoPresumido = (servico ? 0 : presumido.icmsIss) * b2b; // só ICMS é repassável; PIS/COFINS cumulativo não gera crédito
     const debitoRPA = faturamentoMensal * (0.0165 + 0.076) + (servico ? 0 : faturamentoMensal * (icmsIssPct / 100));
     const repassadoRPA = debitoRPA * b2b; // já não cumulativo hoje: repassa o imposto destacado por inteiro
@@ -830,30 +425,7 @@
     };
   }
 
-  // ---------- Simulação do comprador/contratante ----------
-  function calcComprador(valor, tipoOperacao, icmsCompraPct, momento, fornecedorHibrido, repasseSimplesPct, ivaRateVal, repasseHibridoNaoPct){
-    const produto = tipoOperacao === 'produto';
-    let creditoSimples, creditoPresumido, creditoRPA;
-
-    if (momento === 'hoje'){
-      creditoSimples = valor * (repasseSimplesPct / 100);
-      creditoPresumido = produto ? valor * (icmsCompraPct / 100) : 0;
-      creditoRPA = produto
-        ? valor * ((icmsCompraPct / 100) + 0.0165 + 0.076)
-        : valor * (0.0165 + 0.076);
-    } else {
-      const ivaLiquidoRate = ivaRateVal / 100;
-      creditoRPA = valor * ivaLiquidoRate;
-      creditoPresumido = valor * ivaLiquidoRate;
-      creditoSimples = fornecedorHibrido ? valor * ivaLiquidoRate : valor * ivaLiquidoRate * (repasseHibridoNaoPct / 100);
-    }
-
-    return {
-      simples: { credito: creditoSimples, custoLiquido: valor - creditoSimples },
-      presumido: { credito: creditoPresumido, custoLiquido: valor - creditoPresumido },
-      rpa: { credito: creditoRPA, custoLiquido: valor - creditoRPA },
-    };
-  }
+  // (A simulação do lado do comprador/contratante agora vive em comprador.html)
 
   // ---------- UI wiring ----------
   const setorSel = $('setor');
@@ -876,32 +448,18 @@
   const repasseSimples = $('repasseSimples'), repasseSimplesOut = $('repasseSimplesOut');
   repasseSimples.addEventListener('input', () => repasseSimplesOut.textContent = repasseSimples.value + '%');
 
-  const tabBtnCarga = $('tabBtnCarga'), tabBtnCredito = $('tabBtnCredito'), tabBtnComprador = $('tabBtnComprador');
-  const panelCarga = $('panelCarga'), panelCredito = $('panelCredito'), panelComprador = $('panelComprador');
+  const tabBtnCarga = $('tabBtnCarga'), tabBtnCredito = $('tabBtnCredito');
+  const panelCarga = $('panelCarga'), panelCredito = $('panelCredito');
   function showTab(which){
     panelCarga.hidden = which !== 'carga';
     panelCredito.hidden = which !== 'credito';
-    panelComprador.hidden = which !== 'comprador';
     tabBtnCarga.classList.toggle('active', which === 'carga');
     tabBtnCredito.classList.toggle('active', which === 'credito');
-    tabBtnComprador.classList.toggle('active', which === 'comprador');
     tabBtnCarga.setAttribute('aria-selected', which === 'carga');
     tabBtnCredito.setAttribute('aria-selected', which === 'credito');
-    tabBtnComprador.setAttribute('aria-selected', which === 'comprador');
   }
   tabBtnCarga.addEventListener('click', () => showTab('carga'));
   tabBtnCredito.addEventListener('click', () => showTab('credito'));
-  tabBtnComprador.addEventListener('click', () => showTab('comprador'));
-
-  const momentoCompra = $('momentoCompra'), hibridoField = $('hibridoField'), repasseHibridoField = $('repasseHibridoField');
-  momentoCompra.addEventListener('change', () => {
-    const isReforma = momentoCompra.value === 'reforma';
-    hibridoField.style.display = isReforma ? 'flex' : 'none';
-    repasseHibridoField.style.display = isReforma ? 'flex' : 'none';
-  });
-
-  const repasseHibridoNao = $('repasseHibridoNao'), repasseHibridoNaoOut = $('repasseHibridoNaoOut');
-  repasseHibridoNao.addEventListener('input', () => repasseHibridoNaoOut.textContent = repasseHibridoNao.value + '%');
 
   $('calcBtn').addEventListener('click', () => {
     const setor = setorSel.value;
@@ -931,7 +489,7 @@
 
     // Comparação hoje: Simples, Presumido e Lucro Real (RPA)
     const rows = [
-      { label: `Simples Nacional (Anexo ${simples.anexoUsado})${simples.acimaDoTeto ? ' ⚠ acima do teto' : ''}`, total: simples.total, aliq: simples.aliqEfetiva },
+      { label: `Simples Nacional (Anexo ${simples.anexoUsado})`, total: simples.total, aliq: simples.aliqEfetiva },
       { label: 'Lucro Presumido', total: presumido.total, aliq: presumido.total / faturamentoMensal },
       { label: 'Lucro Real (RPA)', total: rpa.total, aliq: rpa.total / faturamentoMensal },
     ];
@@ -962,14 +520,7 @@
       reformNote = `Na projeção de IVA pleno (2033), a carga estimada sobe para <span class="savings negative">${fmtBRL(reforma.total)}</span> em relação à melhor opção de hoje — o efeito tende a ser menor se você conseguir aproveitar mais créditos sobre seus insumos.`;
     }
 
-    const tetoWarning = simples.acimaDoTeto ? `
-      <div class="reform-note" style="border-left-color:var(--brick); margin:0 0 22px;">
-        <strong>Atenção:</strong> a receita bruta dos últimos 12 meses informada (${fmtBRL(rbt12)}) está acima do teto do Simples Nacional (R$ 4.800.000). Nesse caso a empresa já estaria excluída do regime (ou sujeita a exclusão a partir do ano seguinte, se o excesso for de até 20%) — o valor mostrado abaixo para o Simples é apenas uma referência com a alíquota máxima da tabela, não um cálculo válido. Confirme a situação com um contador.
-      </div>
-    ` : '';
-
     verdict.innerHTML = `
-      ${tetoWarning}
       <h3>Hoje, ${cheaper} sai mais barato para esta empresa</h3>
       <p>Diferença mensal estimada para a segunda opção mais barata: <span class="savings">${fmtBRL(diff)}</span> (${fmtBRL(diff*12)} ao ano).</p>
       <p>${reformNote}</p>
@@ -978,11 +529,13 @@
 
     // Breakdowns
     $('bkSimplesBody').innerHTML = `
+      ${simples.excedeuTeto ? `<p style="color:var(--brick); font-weight:600; margin:0 0 12px;">⚠ RBT12 acima de R$ 4.800.000 — nesse patamar a empresa já estaria excluída do Simples Nacional. O cálculo abaixo usa a 6ª faixa apenas como referência ilustrativa.</p>` : ''}
       <div class="bk-row"><span>Anexo utilizado</span><span>${simples.anexoUsado}${simples.fatorR!==null ? ' (Fator R: '+fmtPct(simples.fatorR*100)+')' : ''}</span></div>
       <div class="bk-row"><span>Alíquota nominal da faixa</span><span>${fmtPct(simples.aliqNominal*100)}</span></div>
       <div class="bk-row"><span>Parcela a deduzir (anual)</span><span>${fmtBRL(simples.deduz)}</span></div>
       <div class="bk-row"><span>Alíquota efetiva</span><span>${fmtPct(simples.aliqEfetiva*100)}</span></div>
       ${simples.cppExtra ? `<div class="bk-row"><span>CPP patronal (Anexo IV, à parte)</span><span>${fmtBRL(simples.cppExtra)}</span></div>` : ''}
+      ${simples.valorIcmsNoDas !== null ? `<div class="bk-row"><span>ICMS embutido no DAS (base do crédito ao cliente PJ — LC 123 art. 23)</span><span>${fmtBRL(simples.valorIcmsNoDas)}</span></div>` : ''}
       <div class="bk-row"><span>Total mensal (DAS)</span><span>${fmtBRL(simples.total)}</span></div>
     `;
 
@@ -1060,69 +613,6 @@
     $('results').style.display = 'block';
     showTab('carga');
     $('results').scrollIntoView({ behavior:'smooth', block:'start' });
-  });
-
-  $('calcCompradorBtn').addEventListener('click', () => {
-    const valor = parseNum($('valorContratado').value) || 0;
-    const tipoOperacao = $('tipoOperacao').value;
-    const icmsCompraPct = parseNum($('icmsCompra').value);
-    const aproveita = $('aproveitaCredito').value === 'sim';
-    const momento = momentoCompra.value;
-    const hibrido = $('fornecedorHibrido').value === 'sim';
-    const repasseSimplesPct = parseFloat(repasseSimples.value);
-    const ivaRateVal = parseFloat(ivaRate.value);
-    const repasseHibridoNaoPct = parseFloat(repasseHibridoNao.value);
-
-    if (valor <= 0){
-      alert('Informe o valor contratado para calcular.');
-      return;
-    }
-
-    const verdictComprador = $('verdictComprador');
-    const compradorBody = $('compradorBody');
-    compradorBody.innerHTML = '';
-
-    if (!aproveita){
-      verdictComprador.innerHTML = `
-        <h3>O regime do fornecedor não muda seu custo</h3>
-        <p>Como você não aproveita crédito tributário, o valor líquido de comprar de qualquer um dos três é o mesmo: <span class="savings">${fmtBRL(valor)}</span>. Nesse caso, compare só preço, prazo e qualidade.</p>
-      `;
-      ['Simples Nacional','Lucro Presumido','Lucro Real (RPA)'].forEach(label => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${label}</td><td class="num">${fmtBRL(0)}</td><td class="num">${fmtBRL(valor)}</td>`;
-        compradorBody.appendChild(tr);
-      });
-      $('compradorResults').style.display = 'block';
-      return;
-    }
-
-    const r = calcComprador(valor, tipoOperacao, icmsCompraPct, momento, hibrido, repasseSimplesPct, ivaRateVal, repasseHibridoNaoPct);
-    const rows = [
-      { label: 'Simples Nacional', ...r.simples },
-      { label: 'Lucro Presumido', ...r.presumido },
-      { label: 'Lucro Real (RPA)', ...r.rpa },
-    ];
-    let best = 0;
-    rows.forEach((row, i) => { if (row.custoLiquido < rows[best].custoLiquido) best = i; });
-
-    rows.forEach((row, i) => {
-      const tr = document.createElement('tr');
-      if (i === best) tr.className = 'best';
-      tr.innerHTML = `<td>${row.label}</td><td class="num">${fmtBRL(row.credito)}</td><td class="num">${fmtBRL(row.custoLiquido)}</td>`;
-      compradorBody.appendChild(tr);
-    });
-
-    const diff = Math.max(...rows.map(r=>r.custoLiquido)) - Math.min(...rows.map(r=>r.custoLiquido));
-    const momentoLabel = momento === 'hoje' ? 'hoje' : 'no cenário de IVA pleno (2033)';
-    verdictComprador.innerHTML = `
-      <h3>${momentoLabel === 'hoje' ? 'Hoje' : 'Na reforma plena'}, comprar de um fornecedor do ${rows[best].label} sai mais barato pra você</h3>
-      <p>Considerando o mesmo preço de tabela, a diferença de custo líquido entre a melhor e a pior opção é de <span class="savings">${fmtBRL(diff)}</span> por mês — só por causa do crédito que sobra pra você.</p>
-      <p>${momento === 'hoje'
-        ? 'Fornecedores do Lucro Real tendem a gerar mais crédito hoje porque já operam em regime não cumulativo pleno; o Simples costuma gerar pouco ou nenhum crédito de PIS/COFINS.'
-        : (hibrido ? 'Como você assumiu que o fornecedor do Simples opta pelo regime híbrido, o crédito fica equivalente ao dos demais regimes.' : 'Como o fornecedor do Simples permaneceu totalmente dentro do DAS, ele ainda repassa menos crédito do que um fornecedor do regime normal — mude a opção acima para comparar o cenário híbrido.')}</p>
-    `;
-
-    $('compradorResults').style.display = 'block';
   });
 })();
 </script>

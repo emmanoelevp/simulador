@@ -1,0 +1,356 @@
+/* Estilos compartilhados — Simulador Tributário EVP
+   Usado por index.html (visão de quem vende/presta serviço)
+   e comprador.html (visão de quem compra/contrata) */
+
+  :root{
+    --paper: #efeee4;
+    --paper-raised: #f7f6ee;
+    --ink: #1e2a22;
+    --ink-soft: #4b5a4f;
+    --rule: #c9c4b2;
+    --rule-strong: #a9a38c;
+    --brass: #a8792e;
+    --brass-dark: #7e5b1f;
+    --brick: #8b3a3a;
+    --forest: #3c5a41;
+    --serif: 'Source Serif 4', serif;
+    --sans: 'IBM Plex Sans', sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before{
+    content:"";
+    position: fixed;
+    inset:0;
+    pointer-events:none;
+    background-image:
+      linear-gradient(var(--rule) 1px, transparent 1px);
+    background-size: 100% 42px;
+    opacity: .05;
+    z-index: 0;
+  }
+
+  .wrap{
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ---------- Header / document block ---------- */
+  header.doc{
+    border-bottom: 2px solid var(--ink);
+    padding: 40px 0 22px;
+    margin-bottom: 40px;
+  }
+  .doc-top{
+    display:flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+    letter-spacing: .02em;
+    margin-bottom: 22px;
+  }
+  h1.title{
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(34px, 5.5vw, 54px);
+    line-height: 1.05;
+    margin: 0 0 12px;
+    letter-spacing: -0.01em;
+  }
+  h1.title em{
+    font-style: normal;
+    color: var(--brass-dark);
+  }
+  .subtitle{
+    max-width: 60ch;
+    font-size: 16.5px;
+    color: var(--ink-soft);
+    margin: 0;
+  }
+  .doc-meta{
+    margin-top: 24px;
+    display:flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .doc-meta strong{ color: var(--ink); font-weight: 500; }
+
+  /* ---------- Section framing (form as ledger) ---------- */
+  section.sheet{
+    border-top: 1px solid var(--rule-strong);
+    padding-top: 28px;
+    margin-top: 36px;
+  }
+  .sheet-head{
+    display:flex;
+    align-items:baseline;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .sheet-num{
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--brass-dark);
+    border: 1px solid var(--brass-dark);
+    padding: 2px 8px;
+    flex-shrink:0;
+  }
+  .sheet-head h2{
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 24px;
+    margin: 0;
+  }
+  .sheet-note{
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin: -10px 0 22px 46px;
+    max-width: 56ch;
+  }
+
+  /* ---------- Fields ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 28px;
+  }
+  .grid.full{ grid-template-columns: 1fr; }
+  .field{ display:flex; flex-direction:column; gap:6px; }
+  .field.span2{ grid-column: 1 / -1; }
+  label{
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  label .hint{
+    display:block;
+    font-weight: 400;
+    color: var(--ink-soft);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  input[type="text"], input[type="number"], select{
+    font-family: var(--mono);
+    font-size: 15px;
+    padding: 10px 12px;
+    border: 1px solid var(--rule-strong);
+    background: var(--paper-raised);
+    color: var(--ink);
+    border-radius: 0;
+    width: 100%;
+  }
+  select{ font-family: var(--sans); font-size: 14.5px; }
+  input:focus, select:focus{
+    outline: 2px solid var(--brass);
+    outline-offset: 1px;
+    border-color: var(--brass);
+  }
+  input[type="range"]{
+    width: 100%;
+    accent-color: var(--brass-dark);
+  }
+  .range-row{
+    display:flex; align-items:center; gap:14px;
+  }
+  .range-row output{
+    font-family: var(--mono);
+    font-size: 15px;
+    min-width: 58px;
+    text-align:right;
+  }
+
+  .btn-row{
+    margin-top: 34px;
+    display:flex;
+    align-items:center;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  button.calc{
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 15px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 14px 26px;
+    cursor: pointer;
+    letter-spacing: .01em;
+  }
+  button.calc:hover{ background: var(--brass-dark); }
+  .btn-caption{ font-size: 13px; color: var(--ink-soft); }
+
+  /* ---------- Results ---------- */
+  #results{ display:none; }
+
+  .tabs{
+    display:flex;
+    gap: 4px;
+    margin-bottom: -1px;
+  }
+  .tab-btn{
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 14px;
+    background: var(--paper);
+    color: var(--ink-soft);
+    border: 1px solid var(--rule-strong);
+    border-bottom: none;
+    padding: 10px 18px 12px;
+    cursor: pointer;
+    position: relative;
+    top: 1px;
+  }
+  .tab-btn.active{
+    background: var(--paper-raised);
+    color: var(--ink);
+    font-weight: 600;
+    border-color: var(--ink);
+  }
+  .tab-btn:not(.active):hover{ color: var(--ink); }
+  .tab-panel{
+    border: 1px solid var(--ink);
+    border-top-color: var(--ink);
+    padding: 26px 24px 6px;
+    background: var(--paper-raised);
+  }
+  .verdict{
+    border: 2px solid var(--ink);
+    padding: 26px 26px 24px;
+    margin-bottom: 32px;
+    position: relative;
+    background: var(--paper-raised);
+  }
+  .verdict::before{
+    content: "PARECER";
+    position:absolute;
+    top:-11px; left: 22px;
+    background: var(--paper-raised);
+    padding: 0 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .08em;
+    color: var(--brass-dark);
+  }
+  .verdict h3{
+    font-family: var(--serif);
+    font-size: 22px;
+    margin: 4px 0 10px;
+  }
+  .verdict p{ margin: 0 0 10px; color: var(--ink-soft); font-size: 14.5px; }
+  .verdict p:last-child{ margin-bottom: 0; }
+  .verdict .savings{
+    font-family: var(--mono);
+    color: var(--forest);
+    font-weight: 600;
+  }
+  .verdict .savings.negative{ color: var(--brick); }
+
+  table.compare{
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 28px;
+    font-size: 14.5px;
+  }
+  table.compare caption{
+    text-align:left;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  table.compare th, table.compare td{
+    border-bottom: 1px solid var(--rule);
+    padding: 10px 8px;
+    text-align: right;
+  }
+  table.compare th:first-child, table.compare td:first-child{
+    text-align:left;
+  }
+  table.compare thead th{
+    font-weight: 600;
+    border-bottom: 2px solid var(--ink);
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    text-transform: none;
+  }
+  table.compare td.num, table.compare th.num{ font-family: var(--mono); }
+  table.compare tr.best td{ font-weight: 600; color: var(--forest); }
+  table.compare tr.best td:first-child::after{
+    content: " ◆ menor carga hoje";
+    font-family: var(--sans);
+    font-weight: 400;
+    font-size: 11.5px;
+    color: var(--forest);
+  }
+
+  details.breakdown{
+    border: 1px solid var(--rule-strong);
+    padding: 14px 18px;
+    margin-bottom: 14px;
+    background: var(--paper-raised);
+  }
+  details.breakdown summary{
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    list-style: none;
+  }
+  details.breakdown summary::-webkit-details-marker{ display:none; }
+  details.breakdown summary::before{
+    content: "+ ";
+    font-family: var(--mono);
+    color: var(--brass-dark);
+  }
+  details.breakdown[open] summary::before{ content: "– "; }
+  .bk-row{
+    display:flex; justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .bk-row:last-child{ border-bottom:none; font-weight:600; padding-top:10px; }
+  .bk-row span:first-child{ font-family: var(--sans); color: var(--ink-soft); }
+
+  .reform-note{
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    border-left: 3px solid var(--brass);
+    padding: 4px 0 4px 16px;
+    margin: 18px 0 0;
+  }
+
+  footer{
+    margin-top: 60px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule-strong);
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+  footer p{ max-width: 72ch; margin: 0 0 10px; }
+
+  @media (max-width: 640px){
+    .grid{ grid-template-columns: 1fr; }
+    .sheet-note{ margin-left: 0; }
+  }
