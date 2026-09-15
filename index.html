@@ -234,6 +234,21 @@
       </details>
 
       <p class="reform-note">"Crédito tomado" é o quanto sua empresa consegue abater de imposto ao comprar insumos ou mercadorias. "Crédito repassado" é o quanto do imposto embutido na sua nota o seu cliente PJ do regime normal consegue usar para abater o imposto dele — quanto maior esse número, mais competitiva fica sua nota fiscal para quem compra de você.</p>
+
+      <div class="verdict" id="verdictHibrido" style="margin-top:28px;"></div>
+
+      <table class="compare" id="hibridoTable">
+        <caption>Se esta empresa está no Simples: crédito repassado ao cliente PJ (Lucro Presumido ou Real), por opção de apuração na transição</caption>
+        <thead>
+          <tr>
+            <th>Opção de apuração do Simples</th>
+            <th class="num">Crédito que o cliente PJ aproveita</th>
+          </tr>
+        </thead>
+        <tbody id="hibridoBody"></tbody>
+      </table>
+
+      <p class="reform-note">A partir de 2027, quem é do Simples pode optar por apurar o IBS/CBS <strong>dentro</strong> do DAS (como hoje) ou <strong>por fora</strong>, no regime não cumulativo pleno — nesse caso o cliente aproveita 100% do imposto destacado na nota, igual a um fornecedor do Lucro Real. Migrar pode tornar sua venda mais competitiva para clientes PJ, mas normalmente significa abrir mão da simplicidade do DAS para essa parcela do imposto. A regulamentação final dessa opção ainda está em curso — trate os números abaixo como uma estimativa para apoiar a decisão, não como o valor exato que sairá na lei.</p>
     </div>
 
   </section>
@@ -600,6 +615,44 @@
       <div class="bk-row"><span>Débito de IVA pleno destacado na nota (100% da alíquota)</span><span>${fmtBRL(cred.debitoReforma)}</span></div>
       <div class="bk-row"><span>Parcela das vendas para clientes PJ do regime normal</span><span>${pctB2B.value}%</span></div>
     `;
+
+    // Simples na transição: DAS integral vs. apuração híbrida do IBS/CBS
+    // (a opção "híbrida" já é matematicamente igual ao regime pleno projetado
+    // — cred.repassadoReforma — porque é exatamente essa a mecânica: a parte
+    // do IBS/CBS que sai do DAS passa a operar como não cumulativa plena).
+    const hibridoBody = $('hibridoBody');
+    hibridoBody.innerHTML = '';
+    const hibridoRows = [
+      { label: 'Permanece 100% dentro do DAS (regra padrão)', valor: cred.repassadoSimples },
+      { label: 'Apura o IBS/CBS por fora do DAS — híbrido (a partir de 2027)', valor: cred.repassadoReforma },
+    ];
+    let bestHibrido = hibridoRows[1].valor >= hibridoRows[0].valor ? 1 : 0;
+    hibridoRows.forEach((r, i) => {
+      const tr = document.createElement('tr');
+      if (i === bestHibrido) tr.className = 'best';
+      tr.innerHTML = `<td>${r.label}</td><td class="num">${fmtBRL(r.valor)}</td>`;
+      hibridoBody.appendChild(tr);
+    });
+
+    const diffHibrido = hibridoRows[1].valor - hibridoRows[0].valor;
+    const verdictHibrido = $('verdictHibrido');
+    if (Math.abs(diffHibrido) < 1){
+      verdictHibrido.innerHTML = `
+        <h3>Para esta simulação, o crédito repassado quase não muda entre as duas opções</h3>
+        <p>Com os números informados, migrar para a apuração híbrida não altera de forma relevante o crédito que seu cliente PJ aproveita — a decisão de migrar deve pesar mais outros fatores, como a complexidade de apurar o IBS/CBS por fora do DAS.</p>
+      `;
+    } else if (diffHibrido > 0){
+      verdictHibrido.innerHTML = `
+        <h3>Migrar para o híbrido tornaria sua nota mais competitiva para clientes do Lucro Real ou Presumido</h3>
+        <p>Permanecendo 100% no DAS, seu cliente PJ aproveita cerca de <span class="savings">${fmtBRL(hibridoRows[0].valor)}</span> por mês em crédito. Se você optasse pela apuração híbrida a partir de 2027, esse crédito subiria para <span class="savings">${fmtBRL(hibridoRows[1].valor)}</span> — uma diferença de <span class="savings">${fmtBRL(diffHibrido)}</span> por mês a favor do cliente.</p>
+        <p>Isso pode pesar a favor da migração se seus clientes forem, principalmente, empresas do Lucro Real ou Presumido sensíveis a esse crédito — mas normalmente tem como contrapartida abrir mão da simplicidade de apurar tudo dentro do DAS. Vale considerar isso junto com o resultado do Lucro Real projetado (aba "Carga tributária") antes de decidir.</p>
+      `;
+    } else {
+      verdictHibrido.innerHTML = `
+        <h3>Para este caso, ficar dentro do DAS já entrega um crédito melhor (ou igual) ao cliente</h3>
+        <p>Com os números informados, permanecer 100% dentro do DAS já repassa <span class="savings">${fmtBRL(hibridoRows[0].valor)}</span> por mês em crédito ao seu cliente PJ, na mesma ordem de grandeza do cenário híbrido (<span class="savings">${fmtBRL(hibridoRows[1].valor)}</span>). Isso costuma acontecer com Comércio/Indústria (Anexos I/II), já que o ICMS embutido no DAS já é bastante próximo do que seria repassado no regime pleno.</p>
+      `;
+    }
 
     $('results').style.display = 'block';
     showTab('carga');
