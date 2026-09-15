@@ -228,6 +228,41 @@
     border-color: var(--ink);
   }
   .tab-btn:not(.active):hover{ color: var(--ink); }
+
+  /* ---------- Env switch (topo: alternar entre visão vendedor/comprador) ---------- */
+  .env-switch{
+    display:flex;
+    gap: 6px;
+    margin: 20px 0 0;
+  }
+  .env-switch a{
+    flex: 1;
+    text-align:center;
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    text-decoration:none;
+    color: var(--ink-soft);
+    background: var(--paper);
+    border: 1px solid var(--rule-strong);
+    border-radius: 3px;
+    padding: 11px 14px;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .env-switch a:hover{ color: var(--ink); border-color: var(--ink); }
+  .env-switch a.active{
+    background: var(--ink);
+    color: var(--paper-raised);
+    border-color: var(--ink);
+    font-weight: 600;
+    cursor: default;
+  }
+  @media (max-width: 520px){
+    .env-switch{ flex-direction: column; }
+  }
+
   .tab-panel{
     border: 1px solid var(--ink);
     border-top-color: var(--ink);
